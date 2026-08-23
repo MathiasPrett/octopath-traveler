@@ -9,9 +9,9 @@ public class Traveler : Unit
     public List<string> ActiveSkills;
     public List<string> PassiveSkills;
 
-    public Traveler(string name, Stats stats, char position, int spMax,
+    public Traveler(string name, Stats stats, int spMax,
         List<string> weapons, List<string> activeSkills, List<string> passiveSkills)
-        : base(name, stats, position)
+        : base(name, stats)
     {
         SpMax = spMax;
         SpCurrent = spMax;

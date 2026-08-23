@@ -6,9 +6,9 @@ public class Beast : Unit
     public int Shields;
     public List<string> Weaknesses;
 
-    public Beast(string name, Stats stats, char position, string skill,
+    public Beast(string name, Stats stats, string skill,
         int shields, List<string> weaknesses)
-        : base(name, stats, position)
+        : base(name, stats)
     {
         Skill = skill;
         Shields = shields;

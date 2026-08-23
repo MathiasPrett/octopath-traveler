@@ -4,14 +4,12 @@ public abstract class Unit
 {
     public string Name;
     public Stats Stats;
-    public char Position;
     public bool Alive;
 
-    protected Unit(string name, Stats stats, char position)
+    protected Unit(string name, Stats stats)
     {
         Name = name;
         Stats = stats;
-        Position = position;
         Alive = true;
     }
 }
