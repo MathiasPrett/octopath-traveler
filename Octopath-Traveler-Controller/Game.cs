@@ -1,3 +1,4 @@
+using Octopath_Traveler.Combat;
 using Octopath_Traveler.Data;
 using Octopath_Traveler.Models;
 using Octopath_Traveler_View;
@@ -35,9 +36,7 @@ public class Game
     }
 
     private void StartCombat(ValidatedTeam team)
-    {
-        // Día 4: cola de turnos, estado del juego y loop de rondas.
-    }
+        => new CombatEngine(_view, team).Run();
 
     private string AskUserToSelectTeamFile()
     {

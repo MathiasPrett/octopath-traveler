@@ -12,4 +12,10 @@ public abstract class Unit
         Stats = stats;
         Alive = true;
     }
+
+    public void ReceiveDamage(int damage)
+    {
+        Stats.ReduceHp(damage);
+        Alive = Stats.HpCurrent > 0;
+    }
 }

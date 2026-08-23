@@ -20,4 +20,7 @@ public class Stats
         ElemDef = elemDef;
         Speed = speed;
     }
+
+    public void ReduceHp(int amount)
+        => HpCurrent = Math.Max(0, HpCurrent - amount);
 }

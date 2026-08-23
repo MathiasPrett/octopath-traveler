@@ -2,6 +2,8 @@ namespace Octopath_Traveler.Models;
 
 public class Traveler : Unit
 {
+    private const int MaxBoostPoints = 5;
+
     public int SpMax;
     public int SpCurrent;
     public int Bp;
@@ -15,9 +17,12 @@ public class Traveler : Unit
     {
         SpMax = spMax;
         SpCurrent = spMax;
-        Bp = 1;
+        Bp = 0;
         Weapons = weapons;
         ActiveSkills = activeSkills;
         PassiveSkills = passiveSkills;
     }
+
+    public void GainBoostPoint()
+        => Bp = Math.Min(Bp + 1, MaxBoostPoints);
 }
