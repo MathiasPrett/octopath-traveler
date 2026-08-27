@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/mathias/Escritorio/eds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {}
+    "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {}
   },
   "projects": {
-    "/home/mathias/Escritorio/eds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {
+    "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/mathias/Escritorio/eds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
+        "projectUniqueName": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
         "projectName": "Octopath-Traveler-View",
-        "projectPath": "/home/mathias/Escritorio/eds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
+        "projectPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
         "packagesPath": "/home/mathias/.nuget/packages/",
-        "outputPath": "/home/mathias/Escritorio/eds/octopath-traveler/Octopath-Traveler-View/obj/",
+        "outputPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/mathias/.nuget/NuGet/NuGet.Config"
@@ -24,7 +24,6 @@
         },
         "frameworks": {
           "net8.0": {
-            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -42,7 +41,6 @@
       },
       "frameworks": {
         "net8.0": {
-          "framework": "net8.0",
           "targetAlias": "net8.0",
           "imports": [
             "net461",
@@ -60,7 +58,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/mathias/.dotnet/sdk/8.0.424/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/256/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

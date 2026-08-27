@@ -1,4 +1,5 @@
 using Octopath_Traveler.Models;
+using Octopath_Traveler.Utils;
 using Octopath_Traveler_View;
 
 namespace Octopath_Traveler.Combat;
@@ -9,15 +10,15 @@ public class TravelerTurn
     private const int SkillOption = 2;
     private const int FleeOption = 4;
 
-    private readonly View _view;
     private readonly CombatRenderer _renderer;
     private readonly ValidatedTeam _team;
+    private readonly OptionReader _optionReader;
 
     public TravelerTurn(View view, CombatRenderer renderer, ValidatedTeam team)
     {
-        _view = view;
         _renderer = renderer;
         _team = team;
+        _optionReader = new OptionReader(view);
     }
 
     public TurnResult Play(Traveler traveler)
@@ -31,13 +32,13 @@ public class TravelerTurn
     private TurnResult ChooseAndExecuteAction(Traveler traveler)
     {
         _renderer.ShowActionMenu(traveler);
-        return ExecuteAction(traveler, ReadOption());
+        return ExecuteAction(traveler, _optionReader.Read());
     }
 
     private TurnResult ExecuteAction(Traveler traveler, int option)
     {
         if (option == BasicAttackOption) return TryBasicAttack(traveler);
-        if (option == SkillOption) return ShowSkillsAndCancel(traveler);
+        if (option == SkillOption) return BrowseSkills(traveler);
         if (option == FleeOption) return Flee();
         return TurnResult.Completed;
     }
@@ -56,7 +57,7 @@ public class TravelerTurn
     private string? ChooseWeapon(Traveler traveler)
     {
         _renderer.ShowWeaponMenu(traveler);
-        int option = ReadOption();
+        int option = _optionReader.Read();
         return IsCancel(option, traveler.Weapons.Count) ? null : traveler.Weapons[option - 1];
     }
 
@@ -64,14 +65,14 @@ public class TravelerTurn
     {
         List<Beast> targets = LivingBeasts();
         _renderer.ShowTargetMenu(traveler, targets);
-        int option = ReadOption();
+        int option = _optionReader.Read();
         return IsCancel(option, targets.Count) ? null : targets[option - 1];
     }
 
     private void AskBoostPoints()
     {
         _renderer.ShowBoostPointPrompt();
-        ReadOption();
+        _optionReader.Read();
     }
 
     private void Attack(Traveler attacker, Beast target, string weaponName)
@@ -81,10 +82,10 @@ public class TravelerTurn
         _renderer.ShowTravelerAttack(new AttackOutcome(attacker, target, damage), weaponName);
     }
 
-    private TurnResult ShowSkillsAndCancel(Traveler traveler)
+    private TurnResult BrowseSkills(Traveler traveler)
     {
         _renderer.ShowSkillMenu(traveler);
-        ReadOption();
+        _optionReader.Read();
         return TurnResult.Cancelled;
     }
 
@@ -99,7 +100,4 @@ public class TravelerTurn
 
     private static bool IsCancel(int option, int itemCount)
         => option > itemCount;
-
-    private int ReadOption()
-        => int.Parse(_view.ReadLine());
 }
