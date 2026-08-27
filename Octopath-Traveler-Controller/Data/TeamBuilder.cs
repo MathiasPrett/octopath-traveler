@@ -13,20 +13,10 @@ public static class TeamBuilder
     }
 
     private static List<Traveler> BuildTravelers(List<ParsedTraveler> parsedTravelers, GameCatalog catalog)
-    {
-        var travelers = new List<Traveler>();
-        foreach (ParsedTraveler parsedTraveler in parsedTravelers)
-            travelers.Add(BuildTraveler(parsedTraveler, catalog));
-        return travelers;
-    }
+        => parsedTravelers.Select(parsed => BuildTraveler(parsed, catalog)).ToList();
 
     private static List<Beast> BuildBeasts(List<string> beastNames, GameCatalog catalog)
-    {
-        var beasts = new List<Beast>();
-        foreach (string beastName in beastNames)
-            beasts.Add(BuildBeast(beastName, catalog));
-        return beasts;
-    }
+        => beastNames.Select(beastName => BuildBeast(beastName, catalog)).ToList();
 
     private static Traveler BuildTraveler(ParsedTraveler parsedTraveler, GameCatalog catalog)
     {
@@ -50,39 +40,22 @@ public static class TeamBuilder
             statsJson.ElemAtk, statsJson.ElemDef, statsJson.Speed);
 
     private static CharacterJson RequireCharacter(string name, GameCatalog catalog)
-    {
-        CharacterJson? character = catalog.FindCharacter(name);
-        if (character == null)
-            throw new InvalidDataException($"El viajero {name} no existe en characters.json");
-        return character;
-    }
+        => catalog.FindCharacter(name)
+           ?? throw new InvalidDataException($"El viajero {name} no existe en characters.json");
 
     private static EnemyJson RequireEnemy(string name, GameCatalog catalog)
-    {
-        EnemyJson? enemy = catalog.FindEnemy(name);
-        if (enemy == null)
-            throw new InvalidDataException($"La bestia {name} no existe en enemies.json");
-        return enemy;
-    }
+        => catalog.FindEnemy(name)
+           ?? throw new InvalidDataException($"La bestia {name} no existe en enemies.json");
 
     private static UnitStatsJson RequireStats(UnitStatsJson? statsJson, string unitName)
-    {
-        if (statsJson == null)
-            throw new InvalidDataException($"La unidad {unitName} no tiene stats en el archivo JSON");
-        return statsJson;
-    }
+        => statsJson
+           ?? throw new InvalidDataException($"La unidad {unitName} no tiene stats en el archivo JSON");
 
     private static int RequireSp(UnitStatsJson statsJson, string travelerName)
-    {
-        if (statsJson.SP == null)
-            throw new InvalidDataException($"El viajero {travelerName} no tiene SP en characters.json");
-        return statsJson.SP.Value;
-    }
+        => statsJson.SP
+           ?? throw new InvalidDataException($"El viajero {travelerName} no tiene SP en characters.json");
 
     private static string RequireSkillName(string? skillName, string beastName)
-    {
-        if (skillName == null)
-            throw new InvalidDataException($"La bestia {beastName} no tiene habilidad en enemies.json");
-        return skillName;
-    }
+        => skillName
+           ?? throw new InvalidDataException($"La bestia {beastName} no tiene habilidad en enemies.json");
 }

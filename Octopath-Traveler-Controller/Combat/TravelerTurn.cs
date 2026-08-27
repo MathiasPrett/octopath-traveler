@@ -57,16 +57,20 @@ public class TravelerTurn
     private string? ChooseWeapon(Traveler traveler)
     {
         _renderer.ShowWeaponMenu(traveler);
-        int option = _optionReader.Read();
-        return IsCancel(option, traveler.Weapons.Count) ? null : traveler.Weapons[option - 1];
+        return ChooseFrom(traveler.Weapons);
     }
 
     private Beast? ChooseTarget(Traveler traveler)
     {
-        List<Beast> targets = LivingBeasts();
+        List<Beast> targets = _team.LivingBeasts();
         _renderer.ShowTargetMenu(traveler, targets);
+        return ChooseFrom(targets);
+    }
+
+    private T? ChooseFrom<T>(List<T> items) where T : class
+    {
         int option = _optionReader.Read();
-        return IsCancel(option, targets.Count) ? null : targets[option - 1];
+        return IsCancel(option, items.Count) ? null : items[option - 1];
     }
 
     private void AskBoostPoints()
@@ -76,11 +80,7 @@ public class TravelerTurn
     }
 
     private void Attack(Traveler attacker, Beast target, string weaponName)
-    {
-        int damage = DamageCalculator.Calculate(attacker, target);
-        target.ReceiveDamage(damage);
-        _renderer.ShowTravelerAttack(new AttackOutcome(attacker, target, damage), weaponName);
-    }
+        => _renderer.ShowTravelerAttack(attacker.Attack(target), weaponName);
 
     private TurnResult BrowseSkills(Traveler traveler)
     {
@@ -94,9 +94,6 @@ public class TravelerTurn
         _renderer.ShowFlee();
         return TurnResult.Fled;
     }
-
-    private List<Beast> LivingBeasts()
-        => _team.Beasts.Where(beast => beast.Alive).ToList();
 
     private static bool IsCancel(int option, int itemCount)
         => option > itemCount;

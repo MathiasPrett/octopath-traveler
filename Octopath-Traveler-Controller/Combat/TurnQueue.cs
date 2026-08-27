@@ -14,7 +14,7 @@ public class TurnQueue
     }
 
     public static List<Unit> Order(ValidatedTeam team)
-        => LivingUnits(team).OrderByDescending(unit => unit.Stats.Speed).ToList();
+        => team.LivingUnits().OrderByDescending(unit => unit.Stats.Speed).ToList();
 
     public bool HasPendingUnits()
         => FirstPendingIndex() < _order.Count;
@@ -30,10 +30,6 @@ public class TurnQueue
 
     public List<Unit> PendingUnits()
         => _order.Skip(FirstPendingIndex()).Where(unit => unit.Alive).ToList();
-
-    private static List<Unit> LivingUnits(ValidatedTeam team)
-        => team.Travelers.Cast<Unit>().Concat(team.Beasts)
-            .Where(unit => unit.Alive).ToList();
 
     private int FirstPendingIndex()
     {

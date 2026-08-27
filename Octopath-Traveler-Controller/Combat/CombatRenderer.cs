@@ -25,6 +25,8 @@ public class CombatRenderer
     private const string PhysicalDamage = "físico";
     private const string WeaponDamage = "de tipo";
     private const char FirstPositionLetter = 'A';
+    private const string QueueSeparator = ".";
+    private const string MenuSeparator = ": ";
 
     private static readonly List<string> ActionOptions =
         new() { "Ataque básico", "Usar habilidad", "Defender", "Huir" };
@@ -42,8 +44,8 @@ public class CombatRenderer
     public void ShowTeamsState(ValidatedTeam team)
     {
         ShowSeparator();
-        ShowTravelersState(team.Travelers);
-        ShowBeastsState(team.Beasts);
+        ShowTeamState(PlayerTeamHeader, DescribeAll(team.Travelers));
+        ShowTeamState(EnemyTeamHeader, DescribeAll(team.Beasts));
     }
 
     public void ShowTurnQueues(List<Unit> currentRound, List<Unit> nextRound)
@@ -88,35 +90,24 @@ public class CombatRenderer
     public void ShowEnemyVictory()
         => ShowBlock(EnemyVictoryMessage);
 
-    private void ShowTravelersState(List<Traveler> travelers)
+    private void ShowTeamState(string header, List<string> descriptions)
     {
-        _view.WriteLine(PlayerTeamHeader);
-        for (int index = 0; index < travelers.Count; index++)
-            ShowUnitState(index, Describe(travelers[index]));
+        _view.WriteLine(header);
+        for (int index = 0; index < descriptions.Count; index++)
+            _view.WriteLine($"{PositionLetter(index)}-{descriptions[index]}");
     }
-
-    private void ShowBeastsState(List<Beast> beasts)
-    {
-        _view.WriteLine(EnemyTeamHeader);
-        for (int index = 0; index < beasts.Count; index++)
-            ShowUnitState(index, Describe(beasts[index]));
-    }
-
-    private void ShowUnitState(int index, string description)
-        => _view.WriteLine($"{PositionLetter(index)}-{description}");
 
     private void ShowQueue(string header, List<Unit> units)
-    {
-        ShowBlock(header);
-        for (int index = 0; index < units.Count; index++)
-            _view.WriteLine($"{index + 1}.{units[index].Name}");
-    }
+        => ShowNumberedList(header, NamesOf(units), QueueSeparator);
 
     private void ShowMenu(string header, List<string> options)
+        => ShowNumberedList(header, options, MenuSeparator);
+
+    private void ShowNumberedList(string header, List<string> items, string separator)
     {
         ShowBlock(header);
-        for (int index = 0; index < options.Count; index++)
-            _view.WriteLine($"{index + 1}: {options[index]}");
+        for (int index = 0; index < items.Count; index++)
+            _view.WriteLine($"{index + 1}{separator}{items[index]}");
     }
 
     private void ShowDamage(AttackOutcome outcome, string damageDescription)
@@ -141,8 +132,14 @@ public class CombatRenderer
     private static string Describe(Beast beast)
         => $"{beast.Name} - HP:{beast.Stats.HpCurrent}/{beast.Stats.HpMax} Shields:{beast.Shields}";
 
+    private static List<string> DescribeAll(List<Traveler> travelers)
+        => travelers.Select(Describe).ToList();
+
     private static List<string> DescribeAll(List<Beast> beasts)
-        => beasts.Select(beast => Describe(beast)).ToList();
+        => beasts.Select(Describe).ToList();
+
+    private static List<string> NamesOf(List<Unit> units)
+        => units.Select(unit => unit.Name).ToList();
 
     private static List<string> WithCancel(List<string> options)
         => options.Append(CancelOption).ToList();

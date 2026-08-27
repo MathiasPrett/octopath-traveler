@@ -19,34 +19,14 @@ public class GameCatalog
     }
 
     public CharacterJson? FindCharacter(string name)
-    {
-        foreach (CharacterJson character in Characters)
-            if (character.Name == name)
-                return character;
-        return null;
-    }
+        => Characters.FirstOrDefault(character => character.Name == name);
 
     public EnemyJson? FindEnemy(string name)
-    {
-        foreach (EnemyJson enemy in Enemies)
-            if (enemy.Name == name)
-                return enemy;
-        return null;
-    }
+        => Enemies.FirstOrDefault(enemy => enemy.Name == name);
 
     public bool HasSkill(string name)
-    {
-        foreach (SkillJson skill in Skills)
-            if (skill.Name == name)
-                return true;
-        return false;
-    }
+        => Skills.Any(skill => skill.Name == name);
 
     public bool HasPassiveSkill(string name)
-    {
-        foreach (PassiveSkillJson passiveSkill in PassiveSkills)
-            if (passiveSkill.Name == name)
-                return true;
-        return false;
-    }
+        => PassiveSkills.Any(passiveSkill => passiveSkill.Name == name);
 }

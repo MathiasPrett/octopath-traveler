@@ -27,12 +27,7 @@ public static class TeamValidator
     }
 
     private static bool AreAllTravelersValid(List<ParsedTraveler> travelers, GameCatalog catalog)
-    {
-        foreach (ParsedTraveler traveler in travelers)
-            if (!IsTravelerValid(traveler, catalog))
-                return false;
-        return true;
-    }
+        => travelers.All(traveler => IsTravelerValid(traveler, catalog));
 
     private static bool IsTravelerValid(ParsedTraveler traveler, GameCatalog catalog)
     {
@@ -56,36 +51,16 @@ public static class TeamValidator
     }
 
     private static bool DoAllActiveSkillsExist(List<string> skillNames, GameCatalog catalog)
-    {
-        foreach (string skillName in skillNames)
-            if (!catalog.HasSkill(skillName))
-                return false;
-        return true;
-    }
+        => skillNames.All(catalog.HasSkill);
 
     private static bool DoAllPassiveSkillsExist(List<string> skillNames, GameCatalog catalog)
-    {
-        foreach (string skillName in skillNames)
-            if (!catalog.HasPassiveSkill(skillName))
-                return false;
-        return true;
-    }
+        => skillNames.All(catalog.HasPassiveSkill);
 
     private static bool DoAllBeastsExist(List<string> beastNames, GameCatalog catalog)
-    {
-        foreach (string beastName in beastNames)
-            if (catalog.FindEnemy(beastName) == null)
-                return false;
-        return true;
-    }
+        => beastNames.All(beastName => catalog.FindEnemy(beastName) != null);
 
     private static List<string> GetTravelerNames(List<ParsedTraveler> travelers)
-    {
-        var names = new List<string>();
-        foreach (ParsedTraveler traveler in travelers)
-            names.Add(traveler.Name);
-        return names;
-    }
+        => travelers.Select(traveler => traveler.Name).ToList();
 
     private static bool HasRepeatedNames(List<string> names)
     {

@@ -10,4 +10,13 @@ public class ValidatedTeam
         Travelers = travelers;
         Beasts = beasts;
     }
+
+    public List<Traveler> LivingTravelers()
+        => Travelers.Where(traveler => traveler.Alive).ToList();
+
+    public List<Beast> LivingBeasts()
+        => Beasts.Where(beast => beast.Alive).ToList();
+
+    public List<Unit> LivingUnits()
+        => LivingTravelers().Cast<Unit>().Concat(LivingBeasts()).ToList();
 }

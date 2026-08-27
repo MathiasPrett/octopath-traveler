@@ -1,6 +1,4 @@
-using Octopath_Traveler.Models;
-
-namespace Octopath_Traveler.Combat;
+namespace Octopath_Traveler.Models;
 
 public static class DamageCalculator
 {

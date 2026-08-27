@@ -1,3 +1,5 @@
+using Octopath_Traveler.Utils;
+
 namespace Octopath_Traveler.Data;
 
 public static class TeamLoader
@@ -5,18 +7,12 @@ public static class TeamLoader
     private const string PlayerTeamHeader = "Player Team";
     private const string EnemyTeamHeader = "Enemy Team";
     private const int NotFound = -1;
+    private const string MissingFileMessage = "No se encontró el archivo de equipo";
 
     public static ParsedTeamFile Load(string path)
     {
-        EnsureFileExists(path);
-        string[] rawLines = File.ReadAllLines(path);
-        return ParseLines(rawLines);
-    }
-
-    private static void EnsureFileExists(string path)
-    {
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"No se encontró el archivo de equipo: {path}");
+        FileGuard.EnsureExists(path, MissingFileMessage);
+        return ParseLines(File.ReadAllLines(path));
     }
 
     private static ParsedTeamFile ParseLines(string[] rawLines)
@@ -33,30 +29,16 @@ public static class TeamLoader
     }
 
     private static string[] TrimAllLines(string[] lines)
-    {
-        string[] trimmed = new string[lines.Length];
-        for (int i = 0; i < lines.Length; i++)
-            trimmed[i] = lines[i].Trim();
-        return trimmed;
-    }
+        => lines.Select(line => line.Trim()).ToArray();
 
     private static List<ParsedTraveler> ParseTravelerLines(string[] lines, int start, int end)
-    {
-        var travelers = new List<ParsedTraveler>();
-        for (int i = start; i < end; i++)
-            if (!IsBlank(lines[i]))
-                travelers.Add(ParseTravelerLine(lines[i]));
-        return travelers;
-    }
+        => NonBlankLines(lines, start, end).Select(ParseTravelerLine).ToList();
 
     private static List<string> ParseBeastLines(string[] lines, int start, int end)
-    {
-        var beastNames = new List<string>();
-        for (int i = start; i < end; i++)
-            if (!IsBlank(lines[i]))
-                beastNames.Add(lines[i]);
-        return beastNames;
-    }
+        => NonBlankLines(lines, start, end).ToList();
+
+    private static IEnumerable<string> NonBlankLines(string[] lines, int start, int end)
+        => lines.Skip(start).Take(end - start).Where(line => !IsBlank(line));
 
     private static bool IsBlank(string line)
         => line.Length == 0;
@@ -95,11 +77,5 @@ public static class TeamLoader
     }
 
     private static List<string> SplitAndTrim(string commaSeparated)
-    {
-        string[] parts = commaSeparated.Split(',');
-        var result = new List<string>();
-        foreach (string part in parts)
-            result.Add(part.Trim());
-        return result;
-    }
+        => commaSeparated.Split(',').Select(part => part.Trim()).ToList();
 }

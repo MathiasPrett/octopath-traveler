@@ -14,14 +14,9 @@ public class BeastTurn
     }
 
     public void Play(Beast beast)
-    {
-        Traveler target = ChooseTarget();
-        int damage = DamageCalculator.Calculate(beast, target);
-        target.ReceiveDamage(damage);
-        _renderer.ShowBeastAttack(new AttackOutcome(beast, target, damage), beast.Skill);
-    }
+        => _renderer.ShowBeastAttack(beast.Attack(ChooseTarget()), beast.Skill);
 
     private Traveler ChooseTarget()
-        => _team.Travelers.Where(traveler => traveler.Alive)
+        => _team.LivingTravelers()
             .OrderByDescending(traveler => traveler.Stats.HpCurrent).First();
 }

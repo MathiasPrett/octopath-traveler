@@ -1,55 +1,33 @@
 using System.Text.Json;
 using Octopath_Traveler.Data.Json;
+using Octopath_Traveler.Utils;
 
 namespace Octopath_Traveler.Data;
 
 public static class UnitDataLoader
 {
+    private const string CharactersFile = "characters.json";
+    private const string EnemiesFile = "enemies.json";
+    private const string SkillsFile = "skills.json";
+    private const string PassiveSkillsFile = "passive_skills.json";
+    private const string MissingFileMessage = "No se encontró el archivo";
+
     private static readonly JsonSerializerOptions Options = new JsonSerializerOptions { IncludeFields = true };
 
     public static GameCatalog LoadCatalog(string dataFolder)
+        => new GameCatalog(
+            ReadJsonList<CharacterJson>(dataFolder, CharactersFile),
+            ReadJsonList<EnemyJson>(dataFolder, EnemiesFile),
+            ReadJsonList<SkillJson>(dataFolder, SkillsFile),
+            ReadJsonList<PassiveSkillJson>(dataFolder, PassiveSkillsFile));
+
+    private static List<T> ReadJsonList<T>(string dataFolder, string fileName)
     {
-        return new GameCatalog(
-            LoadCharacters(dataFolder),
-            LoadEnemies(dataFolder),
-            LoadSkills(dataFolder),
-            LoadPassiveSkills(dataFolder));
+        string path = Path.Combine(dataFolder, fileName);
+        FileGuard.EnsureExists(path, MissingFileMessage);
+        return Deserialize<T>(File.ReadAllText(path));
     }
 
-    public static List<CharacterJson> LoadCharacters(string dataFolder)
-    {
-        string path = Path.Combine(dataFolder, "characters.json");
-        return ReadJsonList<CharacterJson>(path);
-    }
-
-    public static List<EnemyJson> LoadEnemies(string dataFolder)
-    {
-        string path = Path.Combine(dataFolder, "enemies.json");
-        return ReadJsonList<EnemyJson>(path);
-    }
-
-    public static List<SkillJson> LoadSkills(string dataFolder)
-    {
-        string path = Path.Combine(dataFolder, "skills.json");
-        return ReadJsonList<SkillJson>(path);
-    }
-
-    public static List<PassiveSkillJson> LoadPassiveSkills(string dataFolder)
-    {
-        string path = Path.Combine(dataFolder, "passive_skills.json");
-        return ReadJsonList<PassiveSkillJson>(path);
-    }
-
-    private static List<T> ReadJsonList<T>(string path)
-    {
-        EnsureFileExists(path);
-        string json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<List<T>>(json, Options) ?? new List<T>();
-    }
-
-    private static void EnsureFileExists(string path)
-    {
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"No se encontró el archivo: {path}");
-    }
+    private static List<T> Deserialize<T>(string json)
+        => JsonSerializer.Deserialize<List<T>>(json, Options) ?? new List<T>();
 }

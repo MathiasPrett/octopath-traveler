@@ -51,9 +51,8 @@ public class CombatEngine
 
     private void GrantBoostPoints()
     {
-        foreach (Traveler traveler in _team.Travelers)
-            if (traveler.Alive)
-                traveler.GainBoostPoint();
+        foreach (Traveler traveler in _team.LivingTravelers())
+            traveler.GainBoostPoint();
     }
 
     private void PlayTurn(TurnQueue queue)
@@ -86,8 +85,8 @@ public class CombatEngine
         => _travelersFled || !AnyTravelerAlive() || !AnyBeastAlive();
 
     private bool AnyTravelerAlive()
-        => _team.Travelers.Any(traveler => traveler.Alive);
+        => _team.LivingTravelers().Count > 0;
 
     private bool AnyBeastAlive()
-        => _team.Beasts.Any(beast => beast.Alive);
+        => _team.LivingBeasts().Count > 0;
 }
