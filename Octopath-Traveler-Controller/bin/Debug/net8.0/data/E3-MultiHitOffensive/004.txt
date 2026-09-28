@@ -1,6 +1,0 @@
-Player Team
-Osvald (Blizzard)
-Enemy Team
-River Fly
-Horned Fly
-Flame Guardian

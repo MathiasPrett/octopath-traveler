@@ -1,8 +1,0 @@
-Player Team
-Primrose (Fox Spirit) [Elemental Augmentation, Hale and Hearty, Inner Strength]
-Hikari (Mercy Strike, True Strike) [Fleefoot, Inner Strength, Elemental Augmentation]
-Alfyn (Icicle) [Elemental Augmentation, Inner Strength]
-Enemy Team
-Mad Ratkin
-Guardian
-Chubby Cait

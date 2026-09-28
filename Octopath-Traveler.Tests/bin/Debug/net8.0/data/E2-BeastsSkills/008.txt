@@ -1,7 +1,0 @@
-Player Team
-Primrose
-Olberic
-Cyrus
-Enemy Team
-Fire Wisp
-Meep

@@ -1,8 +1,0 @@
-Player Team
-Hikari
-Temenos
-Enemy Team
-Wind Wisp
-Hoary Bear
-Dark Elemental
-Light Guardian

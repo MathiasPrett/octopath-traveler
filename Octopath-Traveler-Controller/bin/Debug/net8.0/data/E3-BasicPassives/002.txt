@@ -1,7 +1,0 @@
-Player Team
-Olberic [Boost Start]
-Primrose
-Therion [Boost Start]
-Enemy Team
-Meep
-Shaggy Meep

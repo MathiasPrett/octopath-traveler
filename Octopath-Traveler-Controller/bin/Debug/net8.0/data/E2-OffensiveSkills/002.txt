@@ -1,6 +1,0 @@
-Player Team
-Osvald (Icewind)
-Enemy Team
-Snow Fox
-Flying Fish
-Cait

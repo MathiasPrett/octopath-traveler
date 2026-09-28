@@ -1,8 +1,0 @@
-Player Team
-Heatcore
-H'aanit
-Enemy Team
-Dreadwolf
-Behemoth
-Monarch
-Fire Wisp

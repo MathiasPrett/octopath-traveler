@@ -8,17 +8,18 @@ public class CombatEngine
     private const int FirstRound = 1;
 
     private readonly ValidatedTeam _team;
-    private readonly CombatRenderer _renderer;
+    private readonly IRoundView _roundView;
     private readonly TravelerTurn _travelerTurn;
     private readonly BeastTurn _beastTurn;
     private bool _travelersFled;
 
-    public CombatEngine(View view, ValidatedTeam team)
+    public CombatEngine(IViewFactory viewFactory, ValidatedTeam team)
     {
         _team = team;
-        _renderer = new CombatRenderer(view);
-        _travelerTurn = new TravelerTurn(view, _renderer, team);
-        _beastTurn = new BeastTurn(_renderer, team);
+        _roundView = viewFactory.CreateRoundView();
+        IBattleView battleView = viewFactory.CreateBattleView();
+        _travelerTurn = new TravelerTurn(battleView, team);
+        _beastTurn = new BeastTurn(battleView, team);
     }
 
     public void Run()
@@ -45,7 +46,7 @@ public class CombatEngine
 
     private void StartRound(int round)
     {
-        _renderer.ShowRoundStart(round);
+        _roundView.AnnounceRoundStart(round);
         GrantBoostPoints();
     }
 
@@ -58,8 +59,8 @@ public class CombatEngine
     private void PlayTurn(TurnQueue queue)
     {
         Unit actor = queue.StartCurrentTurn();
-        _renderer.ShowTeamsState(_team);
-        _renderer.ShowTurnQueues(queue.PendingUnits(), TurnQueue.Order(_team));
+        _roundView.ShowTeamsState(_team);
+        _roundView.ShowTurnQueues(queue.PendingUnits(), TurnQueue.Order(_team));
         PlayUnitTurn(actor);
     }
 
@@ -77,8 +78,8 @@ public class CombatEngine
 
     private void ShowWinner()
     {
-        if (AnyBeastAlive()) _renderer.ShowEnemyVictory();
-        else _renderer.ShowPlayerVictory();
+        if (AnyBeastAlive()) _roundView.AnnounceEnemyVictory();
+        else _roundView.AnnouncePlayerVictory();
     }
 
     private bool IsCombatOver()

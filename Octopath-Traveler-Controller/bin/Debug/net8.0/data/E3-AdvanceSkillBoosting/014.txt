@@ -1,8 +1,0 @@
-Player Team
-Tressa (Ventus Saltare)
-Enemy Team
-Meep
-Horse Fly
-River Fly
-Wolf
-Ice Guardian
