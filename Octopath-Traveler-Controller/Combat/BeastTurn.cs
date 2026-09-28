@@ -15,9 +15,9 @@ public class BeastTurn
     }
 
     public void Play(Beast beast)
-        => _battleView.AnnounceBeastAttack(beast.Attack(ChooseTarget()), beast.Skill);
+        => _battleView.AnnounceBeastAttack(beast, beast.UseSkill(ChooseTarget()));
 
     private Traveler ChooseTarget()
         => _team.LivingTravelers()
-            .OrderByDescending(traveler => traveler.Stats.HpCurrent).First();
+            .OrderByDescending(traveler => traveler.CurrentHp).First();
 }

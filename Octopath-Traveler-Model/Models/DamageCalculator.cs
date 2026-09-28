@@ -2,10 +2,14 @@ namespace Octopath_Traveler.Models;
 
 public static class DamageCalculator
 {
-    private const double BasicAttackModifier = 1.3;
     private const int MinimumDamage = 0;
 
-    public static int Calculate(Unit attacker, Unit defender)
+    // El truncado va al final: (atk * mod - def) * multiplicador, y recién ahí floor.
+    public static int Calculate(Unit attacker, Unit target, Attack attack)
         => Math.Max(MinimumDamage, (int)Math.Floor(
-            attacker.Stats.PhysAtk * BasicAttackModifier - defender.Stats.PhysDef));
+            BaseDamage(attacker, target, attack) * target.DamageMultiplierFor(attack.Type)));
+
+    private static double BaseDamage(Unit attacker, Unit target, Attack attack)
+        => attacker.OffensiveStat(attack.Type.Category) * attack.Modifier
+           - target.DefensiveStat(attack.Type.Category);
 }

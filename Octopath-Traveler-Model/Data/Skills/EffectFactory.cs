@@ -17,11 +17,9 @@ public static class EffectFactory
     };
 
     public static Effect? CreateDamageEffect(SkillJson skill)
-    {
-        AttackCategory? category = AttackTypeCatalog.Classify(skill.Type);
-        if (category == null) return null;
-        return new DamageEffect(category.Value, skill.Modifier);
-    }
+        => skill.Type != null && AttackType.Exists(skill.Type)
+            ? new DamageEffect(AttackType.Named(skill.Type), skill.Modifier)
+            : null;
 
     public static Effect? CreateStatBonusEffect(PassiveSkillJson passiveSkill)
         => passiveSkill.Name != null && StatBonuses.TryGetValue(passiveSkill.Name, out Effect? effect)

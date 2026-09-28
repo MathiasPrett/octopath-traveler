@@ -38,10 +38,8 @@ public class CombatEngine
         StartRound(round);
         TurnQueue queue = new TurnQueue(_team);
         while (queue.HasPendingUnits() && !IsCombatOver())
-        {
             PlayTurn(queue);
-            queue.FinishCurrentTurn();
-        }
+        EndRound();
     }
 
     private void StartRound(int round)
@@ -56,12 +54,19 @@ public class CombatEngine
             traveler.GainBoostPoint();
     }
 
+    private void EndRound()
+    {
+        foreach (Unit unit in _team.AllUnits())
+            unit.EndRound();
+    }
+
     private void PlayTurn(TurnQueue queue)
     {
-        Unit actor = queue.StartCurrentTurn();
+        Unit actor = queue.NextUnit();
         _roundView.ShowTeamsState(_team);
-        _roundView.ShowTurnQueues(queue.PendingUnits(), TurnQueue.Order(_team));
+        _roundView.ShowTurnQueues(queue.PendingUnits(), TurnQueue.NextRoundOrder(_team));
         PlayUnitTurn(actor);
+        queue.MarkPlayed(actor);
     }
 
     private void PlayUnitTurn(Unit actor)

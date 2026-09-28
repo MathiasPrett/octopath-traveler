@@ -1,4 +1,4 @@
-namespace Octopath_Traveler.Models.Skills;
+namespace Octopath_Traveler.Models;
 
 public enum AttackCategory
 {

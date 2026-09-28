@@ -30,7 +30,7 @@ public class TravelerTurn
         if (action == TravelerAction.BasicAttack) return TryBasicAttack(traveler);
         if (action == TravelerAction.Skill) return BrowseSkills(traveler);
         if (action == TravelerAction.Flee) return Flee();
-        return TurnResult.Completed;
+        return Defend(traveler);
     }
 
     private TurnResult TryBasicAttack(Traveler traveler)
@@ -40,12 +40,18 @@ public class TravelerTurn
         Beast? target = _battleView.AskForTarget(traveler, _team.LivingBeasts());
         if (target == null) return TurnResult.Cancelled;
         _battleView.AskForBoostPoints();
-        return Attack(traveler, target, weapon);
+        return BasicAttack(traveler, target, weapon);
     }
 
-    private TurnResult Attack(Traveler attacker, Beast target, string weaponName)
+    private TurnResult BasicAttack(Traveler traveler, Beast target, string weaponName)
     {
-        _battleView.AnnounceTravelerAttack(attacker.Attack(target), weaponName);
+        _battleView.AnnounceTravelerAttack(traveler, traveler.BasicAttack(target, weaponName));
+        return TurnResult.Completed;
+    }
+
+    private TurnResult Defend(Traveler traveler)
+    {
+        traveler.Defend();
         return TurnResult.Completed;
     }
 

@@ -13,7 +13,12 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
     private const string FleeMessage = "El equipo de viajeros ha huido!";
     private const string AttacksMessage = "ataca";
     private const string UsesMessage = "usa";
+    private const string DefendsMessage = "se defiende";
+    private const string BreakingPointMessage = "entra en Breaking Point";
+    private const string WeaknessSuffix = " con debilidad";
+    private const string NoSuffix = "";
     private const string PhysicalDamage = "físico";
+    private const string ElementalDamage = "elemental";
     private const string WeaponDamage = "de tipo";
     private const string MenuSeparator = ": ";
     private const int BasicAttackOption = 1;
@@ -60,31 +65,39 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
         return _optionReader.Read();
     }
 
-    public void AnnounceTravelerAttack(AttackOutcome outcome, string weaponName)
+    public void AnnounceTravelerAttack(Traveler attacker, HitResult hit)
     {
-        ShowBlock($"{outcome.Attacker.Name} {AttacksMessage}");
-        ShowDamage(outcome, $"{WeaponDamage} {weaponName}");
+        ShowBlock($"{attacker.Name} {AttacksMessage}");
+        ShowHit(hit, $"{WeaponDamage} {hit.Type.Name}");
     }
 
-    public void AnnounceBeastAttack(AttackOutcome outcome, string skillName)
+    public void AnnounceBeastAttack(Beast attacker, HitResult hit)
     {
-        ShowBlock($"{outcome.Attacker.Name} {UsesMessage} {skillName}");
-        ShowDamage(outcome, PhysicalDamage);
+        ShowBlock($"{attacker.Name} {UsesMessage} {attacker.Skill}");
+        ShowHit(hit, DamageKind(hit.Type));
     }
 
     public void AnnounceFlee()
         => ShowBlock(FleeMessage);
 
-    private void ShowMenu(string header, List<string> options)
+    private void ShowMenu(string header, IReadOnlyList<string> options)
         => ShowNumberedList(header, options, MenuSeparator);
 
-    private void ShowDamage(AttackOutcome outcome, string damageDescription)
+    private void ShowHit(HitResult hit, string damageDescription)
     {
-        WriteLine($"{outcome.Target.Name} recibe {outcome.Damage} de daño {damageDescription}");
-        WriteLine($"{outcome.Target.Name} termina con HP:{outcome.Target.Stats.HpCurrent}");
+        if (hit.TargetWasDefending) WriteLine($"{hit.Target.Name} {DefendsMessage}");
+        WriteLine($"{hit.Target.Name} recibe {hit.Damage} de daño {damageDescription}{Weakness(hit)}");
+        if (hit.CausedBreak) WriteLine($"{hit.Target.Name} {BreakingPointMessage}");
+        WriteLine($"{hit.Target.Name} termina con HP:{hit.Target.CurrentHp}");
     }
 
-    private T? ChooseFrom<T>(List<T> items) where T : class
+    private static string Weakness(HitResult hit)
+        => hit.ExploitedWeakness ? WeaknessSuffix : NoSuffix;
+
+    private static string DamageKind(AttackType type)
+        => type.Category == AttackCategory.Physical ? PhysicalDamage : ElementalDamage;
+
+    private T? ChooseFrom<T>(IReadOnlyList<T> items) where T : class
     {
         int option = _optionReader.Read();
         return IsCancel(option, items.Count) ? null : items[option - 1];
@@ -101,6 +114,6 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
         return TravelerAction.Defend;
     }
 
-    private static List<string> WithCancel(List<string> options)
+    private static List<string> WithCancel(IReadOnlyList<string> options)
         => options.Append(CancelOption).ToList();
 }

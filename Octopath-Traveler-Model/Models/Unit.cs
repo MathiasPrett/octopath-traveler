@@ -2,27 +2,62 @@ namespace Octopath_Traveler.Models;
 
 public abstract class Unit
 {
-    public string Name;
-    public Stats Stats;
-    public bool Alive;
+    protected const double NoDamageChange = 1;
+
+    private readonly Stats _stats;
+    private TurnPriority _priorityNextRound = TurnPriority.Normal;
+
+    public string Name { get; }
 
     protected Unit(string name, Stats stats)
     {
         Name = name;
-        Stats = stats;
-        Alive = true;
+        _stats = stats;
     }
 
-    public void ReceiveDamage(int damage)
+    public int CurrentHp => _stats.HpCurrent;
+    public int MaxHp => _stats.HpMax;
+    public int Speed => _stats.Speed;
+    public bool IsAlive => CurrentHp > 0;
+
+    public virtual bool IsDefending => false;
+    public virtual bool CanActThisRound => IsAlive;
+    public virtual bool CanActNextRound => IsAlive;
+
+    public TurnPriority PriorityThisRound { get; private set; } = TurnPriority.Normal;
+    public virtual TurnPriority PriorityNextRound => _priorityNextRound;
+
+    public int OffensiveStat(AttackCategory category) => _stats.Offensive(category);
+    public int DefensiveStat(AttackCategory category) => _stats.Defensive(category);
+
+    public void ApplyStatBonus(StatType stat, int amount) => _stats.ApplyBonus(stat, amount);
+
+    public virtual double DamageMultiplierFor(AttackType type) => NoDamageChange;
+
+    public virtual bool IsWeakTo(AttackType type) => false;
+
+    public HitResult Hit(Unit target, Attack attack)
+        => target.TakeHit(DamageCalculator.Calculate(this, target, attack), attack.Type);
+
+    public virtual void EndRound()
     {
-        Stats.ReduceHp(damage);
-        Alive = Stats.HpCurrent > 0;
+        PriorityThisRound = _priorityNextRound;
+        _priorityNextRound = TurnPriority.Normal;
     }
 
-    public AttackOutcome Attack(Unit target)
+    protected virtual HitResult TakeHit(int damage, AttackType type)
     {
-        int damage = DamageCalculator.Calculate(this, target);
-        target.ReceiveDamage(damage);
-        return new AttackOutcome(this, target, damage);
+        bool wasDefending = IsDefending;
+        _stats.ReduceHp(damage);
+        return new HitResult
+        {
+            Target = this,
+            Damage = damage,
+            Type = type,
+            TargetWasDefending = wasDefending
+        };
     }
+
+    protected void ClaimPriorityNextRound(TurnPriority priority)
+        => _priorityNextRound = priority;
 }

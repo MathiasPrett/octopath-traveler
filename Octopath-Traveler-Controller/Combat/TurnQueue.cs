@@ -4,38 +4,37 @@ namespace Octopath_Traveler.Combat;
 
 public class TurnQueue
 {
-    private readonly List<Unit> _order;
-    private int _cursor;
+    // Quiénes juegan la ronda se fija al empezarla: una unidad revivida a mitad de ronda
+    // no alcanza a jugarla. El orden, en cambio, se recalcula en cada turno.
+    private readonly List<Unit> _participants;
+    private readonly List<Unit> _alreadyPlayed = new List<Unit>();
 
     public TurnQueue(ValidatedTeam team)
     {
-        _order = Order(team);
-        _cursor = 0;
+        _participants = team.LivingUnits().Where(unit => unit.CanActThisRound).ToList();
     }
 
-    public static List<Unit> Order(ValidatedTeam team)
-        => team.LivingUnits().OrderByDescending(unit => unit.Stats.Speed).ToList();
+    public static List<Unit> NextRoundOrder(ValidatedTeam team)
+        => ByPriority(team.LivingUnits().Where(unit => unit.CanActNextRound),
+            unit => unit.PriorityNextRound);
 
     public bool HasPendingUnits()
-        => FirstPendingIndex() < _order.Count;
+        => PendingUnits().Count > 0;
 
-    public Unit StartCurrentTurn()
-    {
-        _cursor = FirstPendingIndex();
-        return _order[_cursor];
-    }
+    public Unit NextUnit()
+        => PendingUnits().First();
 
-    public void FinishCurrentTurn()
-        => _cursor++;
+    public void MarkPlayed(Unit unit)
+        => _alreadyPlayed.Add(unit);
 
     public List<Unit> PendingUnits()
-        => _order.Skip(FirstPendingIndex()).Where(unit => unit.Alive).ToList();
+        => ByPriority(_participants.Where(IsPending), unit => unit.PriorityThisRound);
 
-    private int FirstPendingIndex()
-    {
-        for (int index = _cursor; index < _order.Count; index++)
-            if (_order[index].Alive)
-                return index;
-        return _order.Count;
-    }
+    private bool IsPending(Unit unit)
+        => !_alreadyPlayed.Contains(unit) && unit.CanActThisRound;
+
+    // OrderBy de LINQ es estable y LivingUnits() ya viene en orden de tablero, con los
+    // viajeros antes que las bestias, así que los empates quedan resueltos solos.
+    private static List<Unit> ByPriority(IEnumerable<Unit> units, Func<Unit, TurnPriority> priority)
+        => units.OrderBy(priority).ThenByDescending(unit => unit.Speed).ToList();
 }

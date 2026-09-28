@@ -9,7 +9,7 @@ public interface IBattleView
     string? AskForSkill(Traveler traveler);
     Beast? AskForTarget(Traveler traveler, List<Beast> targets);
     int AskForBoostPoints();
-    void AnnounceTravelerAttack(AttackOutcome outcome, string weaponName);
-    void AnnounceBeastAttack(AttackOutcome outcome, string skillName);
+    void AnnounceTravelerAttack(Traveler attacker, HitResult hit);
+    void AnnounceBeastAttack(Beast attacker, HitResult hit);
     void AnnounceFlee();
 }

@@ -9,6 +9,6 @@ public static class SkillFactory
     {
         Effect? effect = EffectFactory.CreateDamageEffect(skill);
         if (effect == null || skill.Name == null || skill.Target == null) return null;
-        return new ActiveSkill(skill.Name, skill.SP, skill.Target, ConditionFactory.Create(skill), effect);
+        return new ActiveSkill(skill.Name, skill.SP, skill.Target, effect);
     }
 }

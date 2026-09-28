@@ -2,21 +2,27 @@ namespace Octopath_Traveler.Models;
 
 public class ValidatedTeam
 {
-    public List<Traveler> Travelers;
-    public List<Beast> Beasts;
+    private readonly List<Traveler> _travelers;
+    private readonly List<Beast> _beasts;
 
     public ValidatedTeam(List<Traveler> travelers, List<Beast> beasts)
     {
-        Travelers = travelers;
-        Beasts = beasts;
+        _travelers = travelers;
+        _beasts = beasts;
     }
 
+    public IReadOnlyList<Traveler> Travelers => _travelers;
+    public IReadOnlyList<Beast> Beasts => _beasts;
+
     public List<Traveler> LivingTravelers()
-        => Travelers.Where(traveler => traveler.Alive).ToList();
+        => _travelers.Where(traveler => traveler.IsAlive).ToList();
 
     public List<Beast> LivingBeasts()
-        => Beasts.Where(beast => beast.Alive).ToList();
+        => _beasts.Where(beast => beast.IsAlive).ToList();
 
     public List<Unit> LivingUnits()
         => LivingTravelers().Cast<Unit>().Concat(LivingBeasts()).ToList();
+
+    public List<Unit> AllUnits()
+        => _travelers.Cast<Unit>().Concat(_beasts).ToList();
 }

@@ -12,5 +12,5 @@ public class BonusEffect : Effect
     }
 
     public override void Apply(Unit user, Unit target)
-        => target.Stats.ApplyBonus(_stat, _amount);
+        => target.ApplyStatBonus(_stat, _amount);
 }

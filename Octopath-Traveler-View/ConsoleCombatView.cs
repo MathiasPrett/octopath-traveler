@@ -25,7 +25,7 @@ public abstract class ConsoleCombatView
         WriteLine(header);
     }
 
-    protected void ShowNumberedList(string header, List<string> items, string separator)
+    protected void ShowNumberedList(string header, IReadOnlyList<string> items, string separator)
     {
         ShowBlock(header);
         for (int index = 0; index < items.Count; index++)
@@ -33,15 +33,15 @@ public abstract class ConsoleCombatView
     }
 
     protected static string Describe(Traveler traveler)
-        => $"{traveler.Name} - HP:{traveler.Stats.HpCurrent}/{traveler.Stats.HpMax}"
+        => $"{traveler.Name} - HP:{traveler.CurrentHp}/{traveler.MaxHp}"
            + $" SP:{traveler.SpCurrent}/{traveler.SpMax} BP:{traveler.Bp}";
 
     protected static string Describe(Beast beast)
-        => $"{beast.Name} - HP:{beast.Stats.HpCurrent}/{beast.Stats.HpMax} Shields:{beast.Shields}";
+        => $"{beast.Name} - HP:{beast.CurrentHp}/{beast.MaxHp} Shields:{beast.Shields}";
 
-    protected static List<string> DescribeAll(List<Traveler> travelers)
+    protected static List<string> DescribeAll(IReadOnlyList<Traveler> travelers)
         => travelers.Select(Describe).ToList();
 
-    protected static List<string> DescribeAll(List<Beast> beasts)
+    protected static List<string> DescribeAll(IReadOnlyList<Beast> beasts)
         => beasts.Select(Describe).ToList();
 }
