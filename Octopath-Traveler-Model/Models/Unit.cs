@@ -30,14 +30,23 @@ public abstract class Unit
     public int OffensiveStat(AttackCategory category) => _stats.Offensive(category);
     public int DefensiveStat(AttackCategory category) => _stats.Defensive(category);
 
-    public void ApplyStatBonus(StatType stat, int amount) => _stats.ApplyBonus(stat, amount);
+    public int StatValue(StatType stat) => _stats.Value(stat);
+
+    public virtual void ApplyStatBonus(StatType stat, int amount) => _stats.ApplyBonus(stat, amount);
 
     public virtual double DamageMultiplierFor(AttackType type) => NoDamageChange;
 
     public virtual bool IsWeakTo(AttackType type) => false;
 
-    public HitResult Hit(Unit target, Attack attack)
+    public DamageEvent Hit(Unit target, Attack attack)
         => target.TakeHit(DamageCalculator.Calculate(this, target, attack), attack.Type);
+
+    // Daño que no pasa por el cálculo: sin tipo y sin reducción por defensa.
+    public DamageEvent TakeDirectDamage(int damage)
+    {
+        ReduceHp(damage);
+        return new DamageEvent { Target = this, Damage = damage };
+    }
 
     public virtual void EndRound()
     {
@@ -45,11 +54,11 @@ public abstract class Unit
         _priorityNextRound = TurnPriority.Normal;
     }
 
-    protected virtual HitResult TakeHit(int damage, AttackType type)
+    protected virtual DamageEvent TakeHit(int damage, AttackType? type)
     {
         bool wasDefending = IsDefending;
-        _stats.ReduceHp(damage);
-        return new HitResult
+        ReduceHp(damage);
+        return new DamageEvent
         {
             Target = this,
             Damage = damage,
@@ -57,6 +66,9 @@ public abstract class Unit
             TargetWasDefending = wasDefending
         };
     }
+
+    protected void ReduceHp(int damage)
+        => _stats.ReduceHp(damage);
 
     protected void ClaimPriorityNextRound(TurnPriority priority)
         => _priorityNextRound = priority;

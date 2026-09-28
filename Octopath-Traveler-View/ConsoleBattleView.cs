@@ -1,4 +1,5 @@
 using Octopath_Traveler.Models;
+using Octopath_Traveler.Models.Skills;
 
 namespace Octopath_Traveler_View;
 
@@ -47,13 +48,20 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
         return ChooseFrom(traveler.Weapons);
     }
 
-    public string? AskForSkill(Traveler traveler)
+    public string? AskForAnyWeapon()
     {
-        ShowMenu($"{SkillMenuHeader} {traveler.Name}", WithCancel(traveler.ActiveSkills));
-        return ChooseFrom(traveler.ActiveSkills);
+        ShowMenu(WeaponMenuHeader, WithCancel(AttackType.WeaponNames));
+        return ChooseFrom(AttackType.WeaponNames);
     }
 
-    public Beast? AskForTarget(Traveler traveler, List<Beast> targets)
+    public ActiveSkill? AskForSkill(Traveler traveler)
+    {
+        IReadOnlyList<ActiveSkill> skills = traveler.AffordableSkills();
+        ShowMenu($"{SkillMenuHeader} {traveler.Name}", WithCancel(NamesOf(skills)));
+        return ChooseFrom(skills);
+    }
+
+    public Unit? AskForTarget(Traveler traveler, IReadOnlyList<Unit> targets)
     {
         ShowMenu($"{TargetMenuHeader} {traveler.Name}", WithCancel(DescribeAll(targets)));
         return ChooseFrom(targets);
@@ -65,16 +73,16 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
         return _optionReader.Read();
     }
 
-    public void AnnounceTravelerAttack(Traveler attacker, HitResult hit)
+    public void AnnounceBasicAttack(ActionReport report)
     {
-        ShowBlock($"{attacker.Name} {AttacksMessage}");
-        ShowHit(hit, $"{WeaponDamage} {hit.Type.Name}");
+        ShowBlock($"{report.Actor.Name} {AttacksMessage}");
+        ShowReport(report);
     }
 
-    public void AnnounceBeastAttack(Beast attacker, HitResult hit)
+    public void AnnounceSkillUse(ActionReport report, string skillName)
     {
-        ShowBlock($"{attacker.Name} {UsesMessage} {attacker.Skill}");
-        ShowHit(hit, DamageKind(hit.Type));
+        ShowBlock($"{report.Actor.Name} {UsesMessage} {skillName}");
+        ShowReport(report);
     }
 
     public void AnnounceFlee()
@@ -83,19 +91,38 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
     private void ShowMenu(string header, IReadOnlyList<string> options)
         => ShowNumberedList(header, options, MenuSeparator);
 
-    private void ShowHit(HitResult hit, string damageDescription)
+    private void ShowReport(ActionReport report)
     {
-        if (hit.TargetWasDefending) WriteLine($"{hit.Target.Name} {DefendsMessage}");
-        WriteLine($"{hit.Target.Name} recibe {hit.Damage} de daño {damageDescription}{Weakness(hit)}");
-        if (hit.CausedBreak) WriteLine($"{hit.Target.Name} {BreakingPointMessage}");
-        WriteLine($"{hit.Target.Name} termina con HP:{hit.Target.CurrentHp}");
+        foreach (CombatEvent combatEvent in report.Events)
+            ShowEvent(combatEvent);
+        foreach (Unit unit in report.UnitsWithHpChanges)
+            WriteLine($"{unit.Name} termina con HP:{unit.CurrentHp}");
     }
 
-    private static string Weakness(HitResult hit)
-        => hit.ExploitedWeakness ? WeaknessSuffix : NoSuffix;
+    private void ShowEvent(CombatEvent combatEvent)
+    {
+        switch (combatEvent)
+        {
+            case DamageEvent damage: ShowDamage(damage); break;
+        }
+    }
 
-    private static string DamageKind(AttackType type)
-        => type.Category == AttackCategory.Physical ? PhysicalDamage : ElementalDamage;
+    private void ShowDamage(DamageEvent damage)
+    {
+        if (damage.TargetWasDefending) WriteLine($"{damage.Target.Name} {DefendsMessage}");
+        WriteLine($"{damage.Target.Name} recibe {damage.Damage} de daño{Describe(damage)}");
+        if (damage.CausedBreak) WriteLine($"{damage.Target.Name} {BreakingPointMessage}");
+    }
+
+    private static string Describe(DamageEvent damage)
+        => DamageKind(damage.Type) + (damage.ExploitedWeakness ? WeaknessSuffix : NoSuffix);
+
+    private static string DamageKind(AttackType? type)
+    {
+        if (type == null) return NoSuffix;
+        if (type.HasName) return $" {WeaponDamage} {type.Name}";
+        return type.Category == AttackCategory.Physical ? $" {PhysicalDamage}" : $" {ElementalDamage}";
+    }
 
     private T? ChooseFrom<T>(IReadOnlyList<T> items) where T : class
     {
@@ -116,4 +143,7 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
 
     private static List<string> WithCancel(IReadOnlyList<string> options)
         => options.Append(CancelOption).ToList();
+
+    private static List<string> NamesOf(IReadOnlyList<ActiveSkill> skills)
+        => skills.Select(skill => skill.Name).ToList();
 }

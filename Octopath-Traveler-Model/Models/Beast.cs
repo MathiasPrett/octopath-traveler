@@ -1,3 +1,5 @@
+using Octopath_Traveler.Models.Skills;
+
 namespace Octopath_Traveler.Models;
 
 public class Beast : Unit
@@ -10,16 +12,15 @@ public class Beast : Unit
     private const int LastRoundBroken = 1;
     private const double WeaknessOrBreakingPointMultiplier = 1.5;
     private const double WeaknessAndBreakingPointMultiplier = 2;
-    private const double AttackModifier = 1.3;
 
     private readonly int _maxShields;
     private readonly List<string> _weaknesses;
     private int _shields;
     private int _roundsBrokenLeft;
 
-    public string Skill { get; }
+    public BeastSkill Skill { get; }
 
-    public Beast(string name, Stats stats, string skill,
+    public Beast(string name, Stats stats, BeastSkill skill,
         int shields, List<string> weaknesses)
         : base(name, stats)
     {
@@ -48,8 +49,8 @@ public class Beast : Unit
         return base.DamageMultiplierFor(type);
     }
 
-    public HitResult UseSkill(Unit target)
-        => Hit(target, new Attack(AttackType.Physical(), AttackModifier));
+    public ActionReport UseSkill(List<Traveler> travelers)
+        => Skill.Use(this, travelers);
 
     public override void EndRound()
     {
@@ -57,9 +58,9 @@ public class Beast : Unit
         base.EndRound();
     }
 
-    protected override HitResult TakeHit(int damage, AttackType type)
+    protected override DamageEvent TakeHit(int damage, AttackType? type)
     {
-        bool exploitedWeakness = IsWeakTo(type);
+        bool exploitedWeakness = type != null && IsWeakTo(type);
         bool causedBreak = exploitedWeakness && LoseShield(damage);
         return base.TakeHit(damage, type) with
         {

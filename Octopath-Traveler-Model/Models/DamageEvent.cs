@@ -1,10 +1,12 @@
 namespace Octopath_Traveler.Models;
 
-public record HitResult
+public record DamageEvent : CombatEvent
 {
-    public required Unit Target { get; init; }
     public required int Damage { get; init; }
-    public required AttackType Type { get; init; }
+
+    // Sin tipo cuando el daño no es físico ni elemental (Vortal Claw).
+    public AttackType? Type { get; init; }
+
     public bool TargetWasDefending { get; init; }
     public bool ExploitedWeakness { get; init; }
     public bool CausedBreak { get; init; }

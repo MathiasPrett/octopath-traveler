@@ -1,19 +1,20 @@
 namespace Octopath_Traveler.Models.Skills;
 
+// Las pasivas de esta entrega solo suben un stat base del portador.
 public class PassiveSkill
 {
-    public string Name;
-    public string Target;
+    private readonly StatType _stat;
+    private readonly int _amount;
 
-    private readonly Effect _effect;
-
-    public PassiveSkill(string name, string target, Effect effect)
+    public PassiveSkill(string name, StatType stat, int amount)
     {
         Name = name;
-        Target = target;
-        _effect = effect;
+        _stat = stat;
+        _amount = amount;
     }
 
-    public void Apply(Unit carrier)
-        => _effect.Apply(carrier, carrier);
+    public string Name { get; }
+
+    public void ApplyTo(Unit carrier)
+        => carrier.ApplyStatBonus(_stat, _amount);
 }

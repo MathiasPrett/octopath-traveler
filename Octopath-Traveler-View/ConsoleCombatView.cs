@@ -32,16 +32,21 @@ public abstract class ConsoleCombatView
             WriteLine($"{index + 1}{separator}{items[index]}");
     }
 
-    protected static string Describe(Traveler traveler)
+    protected static string Describe(Unit unit)
+        => unit switch
+        {
+            Traveler traveler => Describe(traveler),
+            Beast beast => Describe(beast),
+            _ => throw new InvalidOperationException($"No se sabe cómo describir a {unit.Name}")
+        };
+
+    protected static List<string> DescribeAll(IReadOnlyList<Unit> units)
+        => units.Select(Describe).ToList();
+
+    private static string Describe(Traveler traveler)
         => $"{traveler.Name} - HP:{traveler.CurrentHp}/{traveler.MaxHp}"
            + $" SP:{traveler.SpCurrent}/{traveler.SpMax} BP:{traveler.Bp}";
 
-    protected static string Describe(Beast beast)
+    private static string Describe(Beast beast)
         => $"{beast.Name} - HP:{beast.CurrentHp}/{beast.MaxHp} Shields:{beast.Shields}";
-
-    protected static List<string> DescribeAll(IReadOnlyList<Traveler> travelers)
-        => travelers.Select(Describe).ToList();
-
-    protected static List<string> DescribeAll(IReadOnlyList<Beast> beasts)
-        => beasts.Select(Describe).ToList();
 }

@@ -1,5 +1,7 @@
 using Octopath_Traveler.Data.Json;
+using Octopath_Traveler.Data.Skills;
 using Octopath_Traveler.Models;
+using Octopath_Traveler.Models.Skills;
 
 namespace Octopath_Traveler.Data;
 
@@ -20,18 +22,38 @@ public static class TeamBuilder
 
     private static Traveler BuildTraveler(ParsedTraveler parsedTraveler, GameCatalog catalog)
     {
+        Traveler traveler = NewTraveler(parsedTraveler, catalog);
+        ApplyPassiveSkills(traveler, parsedTraveler.PassiveSkillNames);
+        return traveler;
+    }
+
+    private static Traveler NewTraveler(ParsedTraveler parsedTraveler, GameCatalog catalog)
+    {
         CharacterJson character = RequireCharacter(parsedTraveler.Name, catalog);
         UnitStatsJson statsJson = RequireStats(character.Stats, parsedTraveler.Name);
-        int spMax = RequireSp(statsJson, parsedTraveler.Name);
-        return new Traveler(parsedTraveler.Name, BuildStats(statsJson), spMax,
-            character.Weapons, parsedTraveler.ActiveSkillNames, parsedTraveler.PassiveSkillNames);
+        return new Traveler(parsedTraveler.Name, BuildStats(statsJson),
+            RequireSp(statsJson, parsedTraveler.Name), character.Weapons,
+            BuildActiveSkills(parsedTraveler.ActiveSkillNames, catalog));
+    }
+
+    private static BeastSkill BuildBeastSkill(string skillName, GameCatalog catalog)
+        => BeastSkillFactory.Create(catalog.FindBeastSkill(skillName)
+           ?? throw new InvalidDataException($"La habilidad {skillName} no existe en beast_skills.json"));
+
+    private static List<ActiveSkill> BuildActiveSkills(List<string> skillNames, GameCatalog catalog)
+        => skillNames.Select(name => SkillFactory.Create(RequireSkill(name, catalog))).ToList();
+
+    private static void ApplyPassiveSkills(Traveler traveler, List<string> passiveSkillNames)
+    {
+        foreach (string passiveSkillName in passiveSkillNames)
+            PassiveSkillFactory.Create(passiveSkillName)?.ApplyTo(traveler);
     }
 
     private static Beast BuildBeast(string beastName, GameCatalog catalog)
     {
         EnemyJson enemy = RequireEnemy(beastName, catalog);
         UnitStatsJson statsJson = RequireStats(enemy.Stats, beastName);
-        string skill = RequireSkillName(enemy.Skill, beastName);
+        BeastSkill skill = BuildBeastSkill(RequireSkillName(enemy.Skill, beastName), catalog);
         return new Beast(beastName, BuildStats(statsJson), skill, enemy.Shields, enemy.Weaknesses);
     }
 
@@ -42,6 +64,10 @@ public static class TeamBuilder
     private static CharacterJson RequireCharacter(string name, GameCatalog catalog)
         => catalog.FindCharacter(name)
            ?? throw new InvalidDataException($"El viajero {name} no existe en characters.json");
+
+    private static SkillJson RequireSkill(string name, GameCatalog catalog)
+        => catalog.FindSkill(name)
+           ?? throw new InvalidDataException($"La habilidad {name} no existe en skills.json");
 
     private static EnemyJson RequireEnemy(string name, GameCatalog catalog)
         => catalog.FindEnemy(name)

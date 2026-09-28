@@ -9,16 +9,20 @@ public static class UnitDataLoader
     private const string EnemiesFile = "enemies.json";
     private const string SkillsFile = "skills.json";
     private const string PassiveSkillsFile = "passive_skills.json";
+    private const string BeastSkillsFile = "beast_skills.json";
     private const string MissingFileMessage = "No se encontró el archivo";
 
     private static readonly JsonSerializerOptions Options = new JsonSerializerOptions { IncludeFields = true };
 
     public static GameCatalog LoadCatalog(string dataFolder)
-        => new GameCatalog(
-            ReadJsonList<CharacterJson>(dataFolder, CharactersFile),
-            ReadJsonList<EnemyJson>(dataFolder, EnemiesFile),
-            ReadJsonList<SkillJson>(dataFolder, SkillsFile),
-            ReadJsonList<PassiveSkillJson>(dataFolder, PassiveSkillsFile));
+        => new GameCatalog
+        {
+            Characters = ReadJsonList<CharacterJson>(dataFolder, CharactersFile),
+            Enemies = ReadJsonList<EnemyJson>(dataFolder, EnemiesFile),
+            Skills = ReadJsonList<SkillJson>(dataFolder, SkillsFile),
+            PassiveSkills = ReadJsonList<PassiveSkillJson>(dataFolder, PassiveSkillsFile),
+            BeastSkills = ReadJsonList<BeastSkillJson>(dataFolder, BeastSkillsFile)
+        };
 
     private static List<T> ReadJsonList<T>(string dataFolder, string fileName)
     {

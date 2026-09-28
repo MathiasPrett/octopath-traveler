@@ -1,4 +1,5 @@
 using Octopath_Traveler.Models;
+using Octopath_Traveler.Models.Skills;
 
 namespace Octopath_Traveler_View;
 
@@ -6,10 +7,11 @@ public interface IBattleView
 {
     TravelerAction AskForAction(Traveler traveler);
     string? AskForWeapon(Traveler traveler);
-    string? AskForSkill(Traveler traveler);
-    Beast? AskForTarget(Traveler traveler, List<Beast> targets);
+    string? AskForAnyWeapon();
+    ActiveSkill? AskForSkill(Traveler traveler);
+    Unit? AskForTarget(Traveler traveler, IReadOnlyList<Unit> targets);
     int AskForBoostPoints();
-    void AnnounceTravelerAttack(Traveler attacker, HitResult hit);
-    void AnnounceBeastAttack(Beast attacker, HitResult hit);
+    void AnnounceBasicAttack(ActionReport report);
+    void AnnounceSkillUse(ActionReport report, string skillName);
     void AnnounceFlee();
 }

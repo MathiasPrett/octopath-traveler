@@ -24,6 +24,19 @@ public class Stats
         Speed = speed;
     }
 
+    public int Value(StatType stat)
+        => stat switch
+        {
+            StatType.HpMax => HpMax,
+            StatType.HpCurrent => HpCurrent,
+            StatType.PhysAtk => _physAtk,
+            StatType.PhysDef => _physDef,
+            StatType.ElemAtk => _elemAtk,
+            StatType.ElemDef => _elemDef,
+            StatType.Speed => Speed,
+            _ => throw new InvalidDataException($"El stat {stat} no es parte de Stats")
+        };
+
     public int Offensive(AttackCategory category)
         => category == AttackCategory.Physical ? _physAtk : _elemAtk;
 

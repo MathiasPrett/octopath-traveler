@@ -10,6 +10,9 @@ public class AttackType
     private static readonly string[] ElementalNames =
         { "Fire", "Ice", "Lightning", "Wind", "Light", "Dark" };
 
+    // Todas las armas del juego, en el orden en que se ofrecen al elegir una.
+    public static IReadOnlyList<string> WeaponNames => PhysicalNames;
+
     public string Name { get; }
     public AttackCategory Category { get; }
 
@@ -30,6 +33,8 @@ public class AttackType
 
     public static bool Exists(string name)
         => PhysicalNames.Contains(name) || ElementalNames.Contains(name);
+
+    public bool HasName => Name != Unnamed;
 
     private static AttackCategory CategoryOf(string name)
     {
