@@ -10,30 +10,32 @@ public class Traveler : Unit
 
     private bool _isDefending;
 
-    public int SpMax { get; private set; }
-    public int SpCurrent { get; private set; }
+    public int MaxSp { get; private set; }
+    public int CurrentSp { get; private set; }
     public int Bp { get; private set; }
     public IReadOnlyList<string> Weapons { get; }
     public IReadOnlyList<ActiveSkill> ActiveSkills { get; }
 
-    public Traveler(string name, Stats stats, int spMax,
+    public Traveler(string name, Stats stats, int maxSp,
         List<string> weapons, List<ActiveSkill> activeSkills)
         : base(name, stats)
     {
-        SpMax = spMax;
-        SpCurrent = spMax;
+        MaxSp = maxSp;
+        CurrentSp = maxSp;
         Weapons = weapons;
         ActiveSkills = activeSkills;
     }
 
     public override bool IsDefending => _isDefending;
 
-    public override double DamageMultiplierFor(AttackType type)
-        => _isDefending ? DefendingDamageReduction : base.DamageMultiplierFor(type);
+    public override T Accept<T>(IUnitVisitor<T> visitor)
+        => visitor.VisitTraveler(this);
 
-    // Las habilidades que no alcanza a pagar no se le ofrecen al jugador.
-    public IReadOnlyList<ActiveSkill> AffordableSkills()
-        => ActiveSkills.Where(skill => skill.SpCost <= SpCurrent).ToList();
+    public override double GetDamageMultiplier(AttackType type)
+        => _isDefending ? DefendingDamageReduction : base.GetDamageMultiplier(type);
+
+    public IReadOnlyList<ActiveSkill> AffordableSkills
+        => ActiveSkills.Where(skill => skill.SpCost <= CurrentSp).ToList();
 
     public ActionReport BasicAttack(Unit target, string weaponName)
     {
@@ -44,7 +46,7 @@ public class Traveler : Unit
 
     public ActionReport Use(ActiveSkill skill, SkillUse use)
     {
-        SpCurrent -= skill.SpCost;
+        CurrentSp -= skill.SpCost;
         return skill.Use(use);
     }
 
@@ -59,7 +61,7 @@ public class Traveler : Unit
 
     public override void ApplyStatBonus(StatType stat, int amount)
     {
-        if (stat == StatType.SpMax) RaiseMaxSp(amount);
+        if (stat == StatType.MaxSp) RaiseMaxSp(amount);
         else base.ApplyStatBonus(stat, amount);
     }
 
@@ -71,7 +73,7 @@ public class Traveler : Unit
 
     private void RaiseMaxSp(int amount)
     {
-        SpMax += amount;
-        SpCurrent += amount;
+        MaxSp += amount;
+        CurrentSp += amount;
     }
 }

@@ -13,47 +13,55 @@ public static class SkillFactory
 
     private static readonly string[] ShootingStarsTypes = { "Wind", "Light", "Dark" };
 
-    // Las habilidades cuyo efecto no se deduce de Type + Modifier del JSON.
-    private static readonly Dictionary<string, Func<SkillJson, Effect>> SpecialEffects = new()
+    private static readonly Dictionary<string, SkillTargeting> Targetings = new()
     {
-        [NightmareChimera] = skill => new WeaponDamageEffect(skill.Modifier),
-        [LastStand] = skill => new LastStandEffect(TypeOf(skill), skill.Modifier),
-        [MercyStrike] = skill => new MercyStrikeEffect(TypeOf(skill), skill.Modifier)
+        ["Single"] = new ChosenTarget(new AllEnemies()),
+        ["Enemies"] = new AllEnemies(),
+        ["Ally"] = new ChosenTarget(new AllAllies()),
+        ["Party"] = new AllAllies(),
+        ["User"] = new UserOnly(),
+        ["Any"] = new AllAllies()
+    };
+
+    private static readonly Dictionary<string, Func<SkillJson, List<Effect>>> SpecialEffects = new()
+    {
+        [ShootingStars] = CreateShootingStarsEffects,
+        [NightmareChimera] = skill => AsList(new WeaponDamageEffect(skill.Modifier)),
+        [LastStand] = skill => AsList(new LastStandEffect(ParseType(skill), skill.Modifier)),
+        [MercyStrike] = skill => AsList(new MercyStrikeEffect(ParseType(skill), skill.Modifier))
     };
 
     public static ActiveSkill Create(SkillJson skill)
     {
         string name = Require(skill.Name, "una habilidad sin nombre");
-        return new ActiveSkill(name, skill.SP, TargetOf(skill), EffectsFor(name, skill));
+        return new ActiveSkill(name, skill.SP, ParseTarget(skill), CreateEffects(name, skill));
     }
 
-    private static List<Effect> EffectsFor(string name, SkillJson skill)
-    {
-        if (name == ShootingStars) return ShootingStarsEffects(skill);
-        if (SpecialEffects.TryGetValue(name, out Func<SkillJson, Effect>? create)) return One(create(skill));
-        return DamageEffects(skill);
-    }
+    private static List<Effect> CreateEffects(string name, SkillJson skill)
+        => SpecialEffects.GetValueOrDefault(name)?.Invoke(skill) ?? CreateDamageEffects(skill);
 
-    private static List<Effect> ShootingStarsEffects(SkillJson skill)
+    private static List<Effect> CreateShootingStarsEffects(SkillJson skill)
         => ShootingStarsTypes
             .Select(type => (Effect)new DamageEffect(AttackType.Named(type), skill.Modifier)).ToList();
 
-    // Sin tipo de ataque no hay daño que calcular: la habilidad se lista en el menú
-    // pero todavía no tiene efecto (curaciones y habilidades de entregas siguientes).
-    private static List<Effect> DamageEffects(SkillJson skill)
-        => skill.Type != null && AttackType.Exists(skill.Type)
-            ? One(new DamageEffect(AttackType.Named(skill.Type), skill.Modifier))
+    private static List<Effect> CreateDamageEffects(SkillJson skill)
+        => DealsTypedDamage(skill)
+            ? AsList(new DamageEffect(ParseType(skill), skill.Modifier))
             : new List<Effect>();
 
-    private static List<Effect> One(Effect effect)
+    private static bool DealsTypedDamage(SkillJson skill)
+        => skill.Type != null && AttackTypeNames.Exists(skill.Type);
+
+    private static List<Effect> AsList(Effect effect)
         => new List<Effect> { effect };
 
-    private static AttackType TypeOf(SkillJson skill)
+    private static AttackType ParseType(SkillJson skill)
         => AttackType.Named(Require(skill.Type, $"el tipo de {skill.Name}"));
 
-    private static SkillTarget TargetOf(SkillJson skill)
-        => Enum.Parse<SkillTarget>(Require(skill.Target, $"el objetivo de {skill.Name}"));
+    private static SkillTargeting ParseTarget(SkillJson skill)
+        => Targetings.GetValueOrDefault(Require(skill.Target, $"el objetivo de {skill.Name}"))
+           ?? throw new InvalidDataException($"{skill.Name} objetivo desconocido");
 
     private static string Require(string? value, string missing)
-        => value ?? throw new InvalidDataException($"skills.json no trae {missing}");
+        => value ?? throw new InvalidDataException($"falta {missing}");
 }

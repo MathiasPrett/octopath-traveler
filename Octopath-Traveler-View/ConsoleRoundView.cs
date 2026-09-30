@@ -42,15 +42,15 @@ public class ConsoleRoundView : ConsoleCombatView, IRoundView
     {
         WriteLine(header);
         for (int index = 0; index < descriptions.Count; index++)
-            WriteLine($"{PositionLetter(index)}-{descriptions[index]}");
+            WriteLine($"{GetPositionLetter(index)}-{descriptions[index]}");
     }
 
     private void ShowQueue(string header, List<Unit> units)
-        => ShowNumberedList(header, NamesOf(units), QueueSeparator);
+        => ShowNumberedList(header, GetNames(units), QueueSeparator);
 
-    private static List<string> NamesOf(List<Unit> units)
+    private static List<string> GetNames(List<Unit> units)
         => units.Select(unit => unit.Name).ToList();
 
-    private static char PositionLetter(int index)
+    private static char GetPositionLetter(int index)
         => (char)(FirstPositionLetter + index);
 }

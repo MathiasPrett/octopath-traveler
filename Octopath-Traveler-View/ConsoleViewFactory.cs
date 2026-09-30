@@ -19,4 +19,7 @@ public class ConsoleViewFactory : IViewFactory
 
     public IBattleView CreateBattleView()
         => new ConsoleBattleView(_view);
+
+    public ICombatLogView CreateCombatLogView()
+        => new ConsoleCombatLogView(_view);
 }

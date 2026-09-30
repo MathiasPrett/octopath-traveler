@@ -24,8 +24,8 @@ public class Game
 
     public void Play()
     {
-        ParsedTeamFile parsedTeam = TeamParser.Parse(_teamView.AskForTeamFile());
-        GameCatalog catalog = UnitDataLoader.LoadCatalog(_dataFolder);
+        ParsedTeamFile parsedTeam = TeamParser.Parse(_teamView.AskForTeamFileLines());
+        GameCatalog catalog = CatalogLoader.LoadCatalog(_dataFolder);
 
         if (!TeamValidator.IsValid(parsedTeam, catalog))
         {

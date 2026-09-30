@@ -15,8 +15,8 @@ public abstract class Unit
         _stats = stats;
     }
 
-    public int CurrentHp => _stats.HpCurrent;
-    public int MaxHp => _stats.HpMax;
+    public int CurrentHp => _stats.CurrentHp;
+    public int MaxHp => _stats.MaxHp;
     public int Speed => _stats.Speed;
     public bool IsAlive => CurrentHp > 0;
 
@@ -27,21 +27,20 @@ public abstract class Unit
     public TurnPriority PriorityThisRound { get; private set; } = TurnPriority.Normal;
     public virtual TurnPriority PriorityNextRound => _priorityNextRound;
 
-    public int OffensiveStat(AttackCategory category) => _stats.Offensive(category);
-    public int DefensiveStat(AttackCategory category) => _stats.Defensive(category);
+    public int GetOffensiveStat(AttackCategory category) => _stats.GetOffensive(category);
+    public int GetDefensiveStat(AttackCategory category) => _stats.GetDefensive(category);
 
-    public int StatValue(StatType stat) => _stats.Value(stat);
+    public int GetStatValue(StatType stat) => _stats.GetValue(stat);
 
     public virtual void ApplyStatBonus(StatType stat, int amount) => _stats.ApplyBonus(stat, amount);
 
-    public virtual double DamageMultiplierFor(AttackType type) => NoDamageChange;
+    public virtual double GetDamageMultiplier(AttackType type) => NoDamageChange;
 
-    public virtual bool IsWeakTo(AttackType type) => false;
+    public abstract T Accept<T>(IUnitVisitor<T> visitor);
 
     public DamageEvent Hit(Unit target, Attack attack)
         => target.TakeHit(DamageCalculator.Calculate(this, target, attack), attack.Type);
 
-    // Daño que no pasa por el cálculo: sin tipo y sin reducción por defensa.
     public DamageEvent TakeDirectDamage(int damage)
     {
         ReduceHp(damage);

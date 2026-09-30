@@ -6,17 +6,16 @@ public static class DamageCalculator
     private const int MinimumSurvivingHp = 1;
 
     public static int Calculate(Unit attacker, Unit target, Attack attack)
-        => Capped(RawDamage(attacker, target, attack), target, attack);
+        => CapDamage(CalculateRawDamage(attacker, target, attack), target, attack);
 
-    // El truncado va al final: (atk * mod - def) * bonus * multiplicador, y recién ahí floor.
-    private static int RawDamage(Unit attacker, Unit target, Attack attack)
-        => Math.Max(MinimumDamage, (int)Math.Floor(BaseDamage(attacker, target, attack)
-            * attack.Bonus * target.DamageMultiplierFor(attack.Type)));
+    private static int CalculateRawDamage(Unit attacker, Unit target, Attack attack)
+        => Math.Max(MinimumDamage, (int)Math.Floor(CalculateBaseDamage(attacker, target, attack)
+            * attack.Bonus * target.GetDamageMultiplier(attack.Type)));
 
-    private static double BaseDamage(Unit attacker, Unit target, Attack attack)
-        => attacker.OffensiveStat(attack.Type.Category) * attack.Modifier
-           - target.DefensiveStat(attack.Type.Category);
+    private static double CalculateBaseDamage(Unit attacker, Unit target, Attack attack)
+        => attacker.GetOffensiveStat(attack.Type.Category) * attack.Modifier
+           - target.GetDefensiveStat(attack.Type.Category);
 
-    private static int Capped(int damage, Unit target, Attack attack)
+    private static int CapDamage(int damage, Unit target, Attack attack)
         => attack.CanKill ? damage : Math.Min(damage, target.CurrentHp - MinimumSurvivingHp);
 }

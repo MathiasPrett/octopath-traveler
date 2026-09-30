@@ -10,11 +10,9 @@ public static class BeastSkillFactory
     private const string PhysicalAttack = "físico";
     private const string EveryTraveler = "Enemies";
 
-    // beast_skills.json no trae el tipo ni el criterio de objetivo: los dos salen de
-    // la descripción.
     private static readonly Dictionary<string, StatType> HighestStatTargets = new()
     {
-        ["mayor HP"] = StatType.HpCurrent,
+        ["mayor HP"] = StatType.CurrentHp,
         ["mayor Elem Atk"] = StatType.ElemAtk,
         ["mayor Phys Atk"] = StatType.PhysAtk,
         ["mayor Phys Def"] = StatType.PhysDef,
@@ -29,39 +27,41 @@ public static class BeastSkillFactory
     };
 
     public static BeastSkill Create(BeastSkillJson skill)
-        => new BeastSkill(NameOf(skill), SelectorFor(skill), new EffectSet(EffectsFor(skill)));
+        => new BeastSkill(RequireName(skill), CreateSelector(skill), CreateEffects(skill));
 
-    private static TargetSelector SelectorFor(BeastSkillJson skill)
+    private static TargetSelector CreateSelector(BeastSkillJson skill)
     {
-        if (skill.Target == EveryTraveler) return new EveryCandidate();
-        string description = DescriptionOf(skill);
-        if (StatIn(HighestStatTargets, description, out StatType highest)) return new HighestStat(highest);
-        if (StatIn(LowestStatTargets, description, out StatType lowest)) return new LowestStat(lowest);
-        throw new InvalidDataException($"No se entiende a quién ataca {skill.Name}");
+        if (skill.Target == EveryTraveler) return new EveryCandidateSelector();
+        string description = RequireDescription(skill);
+        return CreateHighestStatSelector(description) ?? CreateLowestStatSelector(description)
+               ?? throw new InvalidDataException($"{skill.Name} sin objetivo");
     }
 
-    private static bool StatIn(Dictionary<string, StatType> targets, string description, out StatType stat)
-    {
-        KeyValuePair<string, StatType> match = targets.FirstOrDefault(pair => description.Contains(pair.Key));
-        stat = match.Value;
-        return match.Key != null;
-    }
+    private static TargetSelector? CreateHighestStatSelector(string description)
+        => FindStatIn(HighestStatTargets, description) is StatType stat ? new HighestStatSelector(stat) : null;
 
-    private static List<Effect> EffectsFor(BeastSkillJson skill)
-        => Repeat(NameOf(skill) == VortalClaw ? new HalveHpEffect() : DamageFor(skill), skill.Hits);
+    private static TargetSelector? CreateLowestStatSelector(string description)
+        => FindStatIn(LowestStatTargets, description) is StatType stat ? new LowestStatSelector(stat) : null;
 
-    private static Effect DamageFor(BeastSkillJson skill)
-        => new DamageEffect(TypeOf(skill), skill.Modifier);
+    private static StatType? FindStatIn(Dictionary<string, StatType> targets, string description)
+        => targets.Where(pair => description.Contains(pair.Key))
+            .Select(pair => (StatType?)pair.Value).FirstOrDefault();
 
-    private static AttackType TypeOf(BeastSkillJson skill)
-        => DescriptionOf(skill).Contains(PhysicalAttack) ? AttackType.Physical() : AttackType.Elemental();
+    private static List<Effect> CreateEffects(BeastSkillJson skill)
+        => Repeat(RequireName(skill) == VortalClaw ? new HalveHpEffect() : CreateDamageEffect(skill), skill.Hits);
+
+    private static Effect CreateDamageEffect(BeastSkillJson skill)
+        => new DamageEffect(DeriveType(skill), skill.Modifier);
+
+    private static AttackType DeriveType(BeastSkillJson skill)
+        => RequireDescription(skill).Contains(PhysicalAttack) ? AttackType.Physical() : AttackType.Elemental();
 
     private static List<Effect> Repeat(Effect effect, int hits)
         => Enumerable.Repeat(effect, hits).ToList();
 
-    private static string NameOf(BeastSkillJson skill)
-        => skill.Name ?? throw new InvalidDataException("beast_skills.json trae una habilidad sin nombre");
+    private static string RequireName(BeastSkillJson skill)
+        => skill.Name ?? throw new InvalidDataException("skill sin nombre");
 
-    private static string DescriptionOf(BeastSkillJson skill)
-        => skill.Description ?? throw new InvalidDataException($"{skill.Name} no trae descripción");
+    private static string RequireDescription(BeastSkillJson skill)
+        => skill.Description ?? throw new InvalidDataException($"{skill.Name} sin descripción");
 }

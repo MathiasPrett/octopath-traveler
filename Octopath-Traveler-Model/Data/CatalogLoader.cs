@@ -3,14 +3,13 @@ using Octopath_Traveler.Data.Json;
 
 namespace Octopath_Traveler.Data;
 
-public static class UnitDataLoader
+public static class CatalogLoader
 {
     private const string CharactersFile = "characters.json";
     private const string EnemiesFile = "enemies.json";
     private const string SkillsFile = "skills.json";
     private const string PassiveSkillsFile = "passive_skills.json";
     private const string BeastSkillsFile = "beast_skills.json";
-    private const string MissingFileMessage = "No se encontró el archivo";
 
     private static readonly JsonSerializerOptions Options = new JsonSerializerOptions { IncludeFields = true };
 
@@ -27,7 +26,6 @@ public static class UnitDataLoader
     private static List<T> ReadJsonList<T>(string dataFolder, string fileName)
     {
         string path = Path.Combine(dataFolder, fileName);
-        FileGuard.EnsureExists(path, MissingFileMessage);
         return Deserialize<T>(File.ReadAllText(path));
     }
 

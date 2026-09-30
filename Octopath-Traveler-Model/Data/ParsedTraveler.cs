@@ -2,9 +2,9 @@ namespace Octopath_Traveler.Data;
 
 public class ParsedTraveler
 {
-    public string Name;
-    public List<string> ActiveSkillNames;
-    public List<string> PassiveSkillNames;
+    public string Name { get; }
+    public List<string> ActiveSkillNames { get; }
+    public List<string> PassiveSkillNames { get; }
 
     public ParsedTraveler(string name, List<string> activeSkillNames, List<string> passiveSkillNames)
     {

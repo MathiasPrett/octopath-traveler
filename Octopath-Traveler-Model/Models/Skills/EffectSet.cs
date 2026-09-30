@@ -1,7 +1,5 @@
 namespace Octopath_Traveler.Models.Skills;
 
-// Los efectos de una habilidad, aplicados objetivo por objetivo. Ese orden es el que
-// siguen los mensajes de las habilidades que golpean varias veces o a varias unidades.
 public class EffectSet
 {
     private readonly List<Effect> _effects;
@@ -17,14 +15,11 @@ public class EffectSet
     public ActionReport ApplyTo(SkillUse use)
     {
         ActionReport report = new ActionReport(use.User);
-        foreach (Unit target in use.Targets)
-            ApplyAll(report, use, target);
+        foreach (CombatEvent combatEvent in use.Targets.SelectMany(target => ApplyAll(use, target)))
+            report.Record(combatEvent);
         return report;
     }
 
-    private void ApplyAll(ActionReport report, SkillUse use, Unit target)
-    {
-        foreach (Effect effect in _effects)
-            report.Record(effect.Apply(use, target));
-    }
+    private IEnumerable<CombatEvent> ApplyAll(SkillUse use, Unit target)
+        => _effects.Select(effect => effect.Apply(use, target));
 }

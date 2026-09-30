@@ -2,9 +2,9 @@ namespace Octopath_Traveler.Models;
 
 public enum StatType
 {
-    HpMax,
-    HpCurrent,
-    SpMax,
+    MaxHp,
+    CurrentHp,
+    MaxSp,
     PhysAtk,
     PhysDef,
     ElemAtk,

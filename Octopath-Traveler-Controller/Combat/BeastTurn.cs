@@ -5,15 +5,18 @@ namespace Octopath_Traveler.Combat;
 
 public class BeastTurn
 {
-    private readonly IBattleView _battleView;
+    private readonly ICombatLogView _combatLog;
     private readonly ValidatedTeam _team;
 
-    public BeastTurn(IBattleView battleView, ValidatedTeam team)
+    public BeastTurn(ICombatLogView combatLog, ValidatedTeam team)
     {
-        _battleView = battleView;
+        _combatLog = combatLog;
         _team = team;
     }
 
-    public void Play(Beast beast)
-        => _battleView.AnnounceSkillUse(beast.UseSkill(_team.LivingTravelers()), beast.Skill.Name);
+    public TurnResult Play(Beast beast)
+    {
+        _combatLog.AnnounceSkillUse(beast.UseSkill(_team.LivingTravelers), beast.SkillName);
+        return TurnResult.Completed;
+    }
 }

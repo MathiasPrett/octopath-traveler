@@ -11,7 +11,4 @@ public interface IBattleView
     ActiveSkill? AskForSkill(Traveler traveler);
     Unit? AskForTarget(Traveler traveler, IReadOnlyList<Unit> targets);
     int AskForBoostPoints();
-    void AnnounceBasicAttack(ActionReport report);
-    void AnnounceSkillUse(ActionReport report, string skillName);
-    void AnnounceFlee();
 }

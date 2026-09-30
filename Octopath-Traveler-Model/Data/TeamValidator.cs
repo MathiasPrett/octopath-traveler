@@ -37,24 +37,17 @@ public static class TeamValidator
     }
 
     private static bool AreActiveSkillsValid(List<string> skillNames, GameCatalog catalog)
-    {
-        if (skillNames.Count > MaxActiveSkills) return false;
-        if (HasRepeatedNames(skillNames)) return false;
-        return DoAllActiveSkillsExist(skillNames, catalog);
-    }
+        => AreSkillsValid(skillNames, MaxActiveSkills, catalog.HasSkill);
 
     private static bool ArePassiveSkillsValid(List<string> skillNames, GameCatalog catalog)
+        => AreSkillsValid(skillNames, MaxPassiveSkills, catalog.HasPassiveSkill);
+
+    private static bool AreSkillsValid(List<string> skillNames, int maxSkills, Func<string, bool> exists)
     {
-        if (skillNames.Count > MaxPassiveSkills) return false;
+        if (skillNames.Count > maxSkills) return false;
         if (HasRepeatedNames(skillNames)) return false;
-        return DoAllPassiveSkillsExist(skillNames, catalog);
+        return skillNames.All(exists);
     }
-
-    private static bool DoAllActiveSkillsExist(List<string> skillNames, GameCatalog catalog)
-        => skillNames.All(catalog.HasSkill);
-
-    private static bool DoAllPassiveSkillsExist(List<string> skillNames, GameCatalog catalog)
-        => skillNames.All(catalog.HasPassiveSkill);
 
     private static bool DoAllBeastsExist(List<string> beastNames, GameCatalog catalog)
         => beastNames.All(beastName => catalog.FindEnemy(beastName) != null);

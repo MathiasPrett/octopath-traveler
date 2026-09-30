@@ -4,64 +4,63 @@ public class Stats
 {
     private const int MinimumHp = 0;
 
-    private int _physAtk;
-    private int _physDef;
-    private int _elemAtk;
-    private int _elemDef;
-
-    public int HpMax { get; private set; }
-    public int HpCurrent { get; private set; }
+    public int MaxHp { get; private set; }
+    public int CurrentHp { get; private set; }
+    public int PhysAtk { get; private set; }
+    public int PhysDef { get; private set; }
+    public int ElemAtk { get; private set; }
+    public int ElemDef { get; private set; }
     public int Speed { get; private set; }
 
-    public Stats(int hpMax, int physAtk, int physDef, int elemAtk, int elemDef, int speed)
+    public Stats(int maxHp, int physAtk, int physDef, int elemAtk, int elemDef, int speed)
     {
-        HpMax = hpMax;
-        HpCurrent = hpMax;
-        _physAtk = physAtk;
-        _physDef = physDef;
-        _elemAtk = elemAtk;
-        _elemDef = elemDef;
+        MaxHp = maxHp;
+        CurrentHp = maxHp;
+        PhysAtk = physAtk;
+        PhysDef = physDef;
+        ElemAtk = elemAtk;
+        ElemDef = elemDef;
         Speed = speed;
     }
 
-    public int Value(StatType stat)
+    public int GetValue(StatType stat)
         => stat switch
         {
-            StatType.HpMax => HpMax,
-            StatType.HpCurrent => HpCurrent,
-            StatType.PhysAtk => _physAtk,
-            StatType.PhysDef => _physDef,
-            StatType.ElemAtk => _elemAtk,
-            StatType.ElemDef => _elemDef,
+            StatType.MaxHp => MaxHp,
+            StatType.CurrentHp => CurrentHp,
+            StatType.PhysAtk => PhysAtk,
+            StatType.PhysDef => PhysDef,
+            StatType.ElemAtk => ElemAtk,
+            StatType.ElemDef => ElemDef,
             StatType.Speed => Speed,
-            _ => throw new InvalidDataException($"El stat {stat} no es parte de Stats")
+            _ => throw new InvalidDataException($"{stat} no existe")
         };
 
-    public int Offensive(AttackCategory category)
-        => category == AttackCategory.Physical ? _physAtk : _elemAtk;
+    public int GetOffensive(AttackCategory category)
+        => category == AttackCategory.Physical ? PhysAtk : ElemAtk;
 
-    public int Defensive(AttackCategory category)
-        => category == AttackCategory.Physical ? _physDef : _elemDef;
+    public int GetDefensive(AttackCategory category)
+        => category == AttackCategory.Physical ? PhysDef : ElemDef;
 
     public void ReduceHp(int amount)
-        => HpCurrent = Math.Max(MinimumHp, HpCurrent - amount);
+        => CurrentHp = Math.Max(MinimumHp, CurrentHp - amount);
 
     public void ApplyBonus(StatType stat, int amount)
     {
         switch (stat)
         {
-            case StatType.HpMax: RaiseMaxHp(amount); break;
-            case StatType.PhysAtk: _physAtk += amount; break;
-            case StatType.PhysDef: _physDef += amount; break;
-            case StatType.ElemAtk: _elemAtk += amount; break;
-            case StatType.ElemDef: _elemDef += amount; break;
+            case StatType.MaxHp: RaiseMaxHp(amount); break;
+            case StatType.PhysAtk: PhysAtk += amount; break;
+            case StatType.PhysDef: PhysDef += amount; break;
+            case StatType.ElemAtk: ElemAtk += amount; break;
+            case StatType.ElemDef: ElemDef += amount; break;
             case StatType.Speed: Speed += amount; break;
         }
     }
 
     private void RaiseMaxHp(int amount)
     {
-        HpMax += amount;
-        HpCurrent += amount;
+        MaxHp += amount;
+        CurrentHp += amount;
     }
 }

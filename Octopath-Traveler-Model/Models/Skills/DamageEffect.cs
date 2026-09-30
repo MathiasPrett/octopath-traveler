@@ -12,8 +12,8 @@ public class DamageEffect : Effect
     }
 
     public override CombatEvent Apply(SkillUse use, Unit target)
-        => use.User.Hit(target, AttackFor(use));
+        => use.User.Hit(target, CreateAttack(use));
 
-    protected virtual Attack AttackFor(SkillUse use)
+    protected virtual Attack CreateAttack(SkillUse use)
         => new Attack(_type, _modifier);
 }

@@ -17,15 +17,18 @@ public class ConsoleTeamView : ITeamView
         _optionReader = new OptionReader(view);
     }
 
-    public string[] AskForTeamFile()
-    {
-        string[] teamFiles = GetSortedTeamFiles();
-        ShowTeamFileOptions(teamFiles);
-        return File.ReadAllLines(teamFiles[_optionReader.Read()]);
-    }
+    public string[] AskForTeamFileLines()
+        => File.ReadAllLines(AskForTeamFilePath());
 
     public void AnnounceInvalidTeamFile()
         => _view.WriteLine(InvalidTeamFileMessage);
+
+    private string AskForTeamFilePath()
+    {
+        string[] teamFiles = GetSortedTeamFiles();
+        ShowTeamFileOptions(teamFiles);
+        return teamFiles[_optionReader.Read()];
+    }
 
     private string[] GetSortedTeamFiles()
     {

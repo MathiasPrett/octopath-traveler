@@ -6,6 +6,8 @@ public abstract class ConsoleCombatView
 {
     private const string Separator = "----------------------------------------";
 
+    private static readonly UnitDescriber Describer = new UnitDescriber();
+
     private readonly View _view;
 
     protected ConsoleCombatView(View view)
@@ -33,20 +35,18 @@ public abstract class ConsoleCombatView
     }
 
     protected static string Describe(Unit unit)
-        => unit switch
-        {
-            Traveler traveler => Describe(traveler),
-            Beast beast => Describe(beast),
-            _ => throw new InvalidOperationException($"No se sabe cómo describir a {unit.Name}")
-        };
+        => unit.Accept(Describer);
 
     protected static List<string> DescribeAll(IReadOnlyList<Unit> units)
         => units.Select(Describe).ToList();
 
-    private static string Describe(Traveler traveler)
-        => $"{traveler.Name} - HP:{traveler.CurrentHp}/{traveler.MaxHp}"
-           + $" SP:{traveler.SpCurrent}/{traveler.SpMax} BP:{traveler.Bp}";
+    private class UnitDescriber : IUnitVisitor<string>
+    {
+        public string VisitTraveler(Traveler traveler)
+            => $"{traveler.Name} - HP:{traveler.CurrentHp}/{traveler.MaxHp}"
+               + $" SP:{traveler.CurrentSp}/{traveler.MaxSp} BP:{traveler.Bp}";
 
-    private static string Describe(Beast beast)
-        => $"{beast.Name} - HP:{beast.CurrentHp}/{beast.MaxHp} Shields:{beast.Shields}";
+        public string VisitBeast(Beast beast)
+            => $"{beast.Name} - HP:{beast.CurrentHp}/{beast.MaxHp} Shields:{beast.Shields}";
+    }
 }

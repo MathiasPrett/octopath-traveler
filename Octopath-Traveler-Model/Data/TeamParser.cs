@@ -11,24 +11,32 @@ public static class TeamParser
         string[] lines = TrimAllLines(rawLines);
         int playerHeaderIndex = Array.IndexOf(lines, PlayerTeamHeader);
         int enemyHeaderIndex = Array.IndexOf(lines, EnemyTeamHeader);
-        if (playerHeaderIndex == NotFound || enemyHeaderIndex == NotFound)
-            return new ParsedTeamFile(new List<ParsedTraveler>(), new List<string>());
-
-        List<ParsedTraveler> travelers = ParseTravelerLines(lines, playerHeaderIndex + 1, enemyHeaderIndex);
-        List<string> beastNames = ParseBeastLines(lines, enemyHeaderIndex + 1, lines.Length);
-        return new ParsedTeamFile(travelers, beastNames);
+        return AreBothFound(playerHeaderIndex, enemyHeaderIndex)
+            ? ParseSections(lines, playerHeaderIndex, enemyHeaderIndex)
+            : CreateEmptyTeam();
     }
+
+    private static ParsedTeamFile ParseSections(string[] lines, int playerHeaderIndex, int enemyHeaderIndex)
+        => new ParsedTeamFile(
+            ParseTravelerLines(lines, playerHeaderIndex + 1, enemyHeaderIndex),
+            ParseBeastLines(lines, enemyHeaderIndex + 1, lines.Length));
+
+    private static ParsedTeamFile CreateEmptyTeam()
+        => new ParsedTeamFile(new List<ParsedTraveler>(), new List<string>());
+
+    private static bool AreBothFound(int firstIndex, int secondIndex)
+        => firstIndex != NotFound && secondIndex != NotFound;
 
     private static string[] TrimAllLines(string[] lines)
         => lines.Select(line => line.Trim()).ToArray();
 
     private static List<ParsedTraveler> ParseTravelerLines(string[] lines, int start, int end)
-        => NonBlankLines(lines, start, end).Select(ParseTravelerLine).ToList();
+        => SelectNonBlankLines(lines, start, end).Select(ParseTravelerLine).ToList();
 
     private static List<string> ParseBeastLines(string[] lines, int start, int end)
-        => NonBlankLines(lines, start, end).ToList();
+        => SelectNonBlankLines(lines, start, end).ToList();
 
-    private static IEnumerable<string> NonBlankLines(string[] lines, int start, int end)
+    private static IEnumerable<string> SelectNonBlankLines(string[] lines, int start, int end)
         => lines.Skip(start).Take(end - start).Where(line => !IsBlank(line));
 
     private static bool IsBlank(string line)
@@ -62,7 +70,7 @@ public static class TeamParser
     {
         int openIndex = line.IndexOf(openChar);
         int closeIndex = line.IndexOf(closeChar);
-        if (openIndex == NotFound || closeIndex == NotFound) return new List<string>();
+        if (!AreBothFound(openIndex, closeIndex)) return new List<string>();
         string inside = line.Substring(openIndex + 1, closeIndex - openIndex - 1).Trim();
         return IsBlank(inside) ? new List<string>() : SplitAndTrim(inside);
     }

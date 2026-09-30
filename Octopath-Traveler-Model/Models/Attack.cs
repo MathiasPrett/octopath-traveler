@@ -7,10 +7,8 @@ public class Attack
     public AttackType Type { get; }
     public double Modifier { get; }
 
-    // Multiplica el daño final, después de restar la defensa (Last Stand).
     public double Bonus { get; }
 
-    // Mercy Strike deja al objetivo en 1 HP como mínimo.
     public bool CanKill { get; }
 
     public Attack(AttackType type, double modifier)

@@ -1,6 +1,5 @@
 namespace Octopath_Traveler.Models.Skills;
 
-// Nightmare Chimera: el tipo de daño es el arma que eligió el jugador.
 public class WeaponDamageEffect : Effect
 {
     private readonly double _modifier;

@@ -1,32 +1,25 @@
 namespace Octopath_Traveler.Models.Skills;
 
-public class ActiveSkill
+public class ActiveSkill : Skill
 {
-    private readonly EffectSet _effects;
+    private readonly SkillTargeting _targeting;
 
-    public ActiveSkill(string name, int spCost, SkillTarget target, List<Effect> effects)
+    public ActiveSkill(string name, int spCost, SkillTargeting targeting, List<Effect> effects)
+        : base(name, effects)
     {
-        Name = name;
         SpCost = spCost;
-        Target = target;
-        _effects = new EffectSet(effects);
+        _targeting = targeting;
     }
 
-    public string Name { get; }
     public int SpCost { get; }
-    public SkillTarget Target { get; }
 
-    public bool NeedsTargetChoice
-        => Target is SkillTarget.Single or SkillTarget.Ally;
+    public bool NeedsTargetChoice => _targeting.NeedsChoice;
 
-    public bool NeedsWeaponChoice
-        => _effects.NeedsWeapon;
+    public bool NeedsWeaponChoice => NeedsWeapon;
 
-    public List<Unit> Candidates(ValidatedTeam team)
-        => Target is SkillTarget.Single or SkillTarget.Enemies
-            ? team.LivingBeasts().Cast<Unit>().ToList()
-            : team.LivingTravelers().Cast<Unit>().ToList();
+    public List<Unit> FindCandidates(ValidatedTeam team, Unit user)
+        => _targeting.FindCandidates(team, user);
 
     public ActionReport Use(SkillUse use)
-        => _effects.ApplyTo(use);
+        => Apply(use);
 }

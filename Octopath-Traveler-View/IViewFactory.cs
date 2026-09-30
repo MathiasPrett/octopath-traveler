@@ -5,4 +5,5 @@ public interface IViewFactory
     ITeamView CreateTeamView();
     IRoundView CreateRoundView();
     IBattleView CreateBattleView();
+    ICombatLogView CreateCombatLogView();
 }

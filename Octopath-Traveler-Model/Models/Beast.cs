@@ -4,53 +4,43 @@ namespace Octopath_Traveler.Models;
 
 public class Beast : Unit
 {
-    // Al romperse pierde el resto de la ronda actual y toda la siguiente.
-    private const int RoundsBroken = 2;
-    private const int NoShields = 0;
-    private const int NoDamage = 0;
-    private const int NotBroken = 0;
-    private const int LastRoundBroken = 1;
     private const double WeaknessOrBreakingPointMultiplier = 1.5;
     private const double WeaknessAndBreakingPointMultiplier = 2;
 
-    private readonly int _maxShields;
     private readonly List<string> _weaknesses;
-    private int _shields;
-    private int _roundsBrokenLeft;
-
-    public BeastSkill Skill { get; }
+    private readonly BeastSkill _skill;
+    private readonly BreakingPoint _breakingPoint;
 
     public Beast(string name, Stats stats, BeastSkill skill,
         int shields, List<string> weaknesses)
         : base(name, stats)
     {
-        Skill = skill;
-        _shields = shields;
-        _maxShields = shields;
+        _skill = skill;
+        _breakingPoint = new BreakingPoint(shields);
         _weaknesses = weaknesses;
     }
 
-    public int Shields => _shields;
-    public bool IsBroken => _roundsBrokenLeft > NotBroken;
+    public int Shields => _breakingPoint.Shields;
+    public string SkillName => _skill.Name;
 
     public override bool CanActThisRound => IsAlive && !IsBroken;
-    public override bool CanActNextRound => IsAlive && _roundsBrokenLeft <= LastRoundBroken;
+    public override bool CanActNextRound => IsAlive && !_breakingPoint.IsBrokenNextRound;
+
+    public override T Accept<T>(IUnitVisitor<T> visitor)
+        => visitor.VisitBeast(this);
 
     public override TurnPriority PriorityNextRound
         => RecoversNextRound ? TurnPriority.RecoveringFromBreak : base.PriorityNextRound;
 
-    public override bool IsWeakTo(AttackType type)
-        => _weaknesses.Contains(type.Name);
-
-    public override double DamageMultiplierFor(AttackType type)
+    public override double GetDamageMultiplier(AttackType type)
     {
-        if (IsWeakTo(type) && IsBroken) return WeaknessAndBreakingPointMultiplier;
-        if (IsWeakTo(type) || IsBroken) return WeaknessOrBreakingPointMultiplier;
-        return base.DamageMultiplierFor(type);
+        if (IsWeakAndBroken(type)) return WeaknessAndBreakingPointMultiplier;
+        if (IsWeakOrBroken(type)) return WeaknessOrBreakingPointMultiplier;
+        return base.GetDamageMultiplier(type);
     }
 
     public ActionReport UseSkill(List<Traveler> travelers)
-        => Skill.Use(this, travelers);
+        => _skill.Use(this, travelers);
 
     public override void EndRound()
     {
@@ -61,30 +51,32 @@ public class Beast : Unit
     protected override DamageEvent TakeHit(int damage, AttackType? type)
     {
         bool exploitedWeakness = type != null && IsWeakTo(type);
-        bool causedBreak = exploitedWeakness && LoseShield(damage);
+        bool wasBroken = IsBroken;
+        if (exploitedWeakness) _breakingPoint.LoseShield(damage);
         return base.TakeHit(damage, type) with
         {
             ExploitedWeakness = exploitedWeakness,
-            CausedBreak = causedBreak
+            CausedBreak = !wasBroken && IsBroken
         };
     }
 
-    private bool RecoversNextRound => _roundsBrokenLeft == LastRoundBroken;
+    private bool IsBroken => _breakingPoint.IsBroken;
+    private bool RecoversNextRound => _breakingPoint.RecoversNextRound;
 
-    private bool LoseShield(int damage)
-    {
-        if (damage == NoDamage || IsBroken) return false;
-        _shields--;
-        if (_shields > NoShields) return false;
-        _roundsBrokenLeft = RoundsBroken;
-        return true;
-    }
+    private bool IsWeakTo(AttackType type)
+        => _weaknesses.Contains(type.Name);
+
+    private bool IsWeakAndBroken(AttackType type)
+        => IsWeakTo(type) && IsBroken;
+
+    private bool IsWeakOrBroken(AttackType type)
+        => IsWeakTo(type) || IsBroken;
 
     private void AdvanceBreakingPoint()
     {
-        _roundsBrokenLeft--;
+        _breakingPoint.AdvanceRound();
         if (IsBroken) return;
         ClaimPriorityNextRound(TurnPriority.RecoveringFromBreak);
-        if (IsAlive) _shields = _maxShields;
+        if (IsAlive) _breakingPoint.RestoreShields();
     }
 }

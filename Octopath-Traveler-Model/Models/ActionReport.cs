@@ -1,6 +1,5 @@
 namespace Octopath_Traveler.Models;
 
-// Todo lo que provocó una acción, en el orden en que debe anunciarse.
 public class ActionReport
 {
     private readonly List<CombatEvent> _events = new List<CombatEvent>();
