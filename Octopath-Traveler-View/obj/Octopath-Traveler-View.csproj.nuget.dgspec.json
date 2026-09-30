@@ -1,0 +1,128 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {}
+  },
+  "projects": {
+    "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/Octopath-Traveler-Model.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/Octopath-Traveler-Model.csproj",
+        "projectName": "Octopath-Traveler-Model",
+        "projectPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/Octopath-Traveler-Model.csproj",
+        "packagesPath": "/home/mathias/.nuget/packages/",
+        "outputPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/mathias/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/mathias/.dotnet/sdk/8.0.424/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
+        "projectName": "Octopath-Traveler-View",
+        "projectPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/Octopath-Traveler-View.csproj",
+        "packagesPath": "/home/mathias/.nuget/packages/",
+        "outputPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/mathias/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/Octopath-Traveler-Model.csproj": {
+                "projectPath": "/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-Model/Octopath-Traveler-Model.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/mathias/.dotnet/sdk/8.0.424/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
