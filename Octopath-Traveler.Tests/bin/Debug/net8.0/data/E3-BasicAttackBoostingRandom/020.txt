@@ -1,7 +1,0 @@
-Player Team
-Heatcore
-Enemy Team
-Ice Wisp
-Hoary Bear
-Monarch
-Dreadwolf

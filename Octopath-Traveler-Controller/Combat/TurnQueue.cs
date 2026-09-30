@@ -4,38 +4,33 @@ namespace Octopath_Traveler.Combat;
 
 public class TurnQueue
 {
-    private readonly List<Unit> _order;
-    private int _cursor;
+    private readonly List<Unit> _participants;
+    private readonly List<Unit> _alreadyPlayed = new List<Unit>();
 
     public TurnQueue(ValidatedTeam team)
     {
-        _order = Order(team);
-        _cursor = 0;
+        _participants = team.LivingUnits.Where(unit => unit.CanActThisRound).ToList();
     }
 
-    public static List<Unit> Order(ValidatedTeam team)
-        => team.LivingUnits().OrderByDescending(unit => unit.Stats.Speed).ToList();
+    public static List<Unit> GetNextRoundOrder(ValidatedTeam team)
+        => SortByPriority(team.LivingUnits.Where(unit => unit.CanActNextRound),
+            unit => unit.PriorityNextRound);
 
     public bool HasPendingUnits()
-        => FirstPendingIndex() < _order.Count;
+        => PendingUnits.Count > 0;
 
-    public Unit StartCurrentTurn()
-    {
-        _cursor = FirstPendingIndex();
-        return _order[_cursor];
-    }
+    public Unit NextUnit
+        => PendingUnits.First();
 
-    public void FinishCurrentTurn()
-        => _cursor++;
+    public void MarkPlayed(Unit unit)
+        => _alreadyPlayed.Add(unit);
 
-    public List<Unit> PendingUnits()
-        => _order.Skip(FirstPendingIndex()).Where(unit => unit.Alive).ToList();
+    public List<Unit> PendingUnits
+        => SortByPriority(_participants.Where(IsPending), unit => unit.PriorityThisRound);
 
-    private int FirstPendingIndex()
-    {
-        for (int index = _cursor; index < _order.Count; index++)
-            if (_order[index].Alive)
-                return index;
-        return _order.Count;
-    }
+    private bool IsPending(Unit unit)
+        => !_alreadyPlayed.Contains(unit) && unit.CanActThisRound;
+
+    private static List<Unit> SortByPriority(IEnumerable<Unit> units, Func<Unit, TurnPriority> priority)
+        => units.OrderBy(priority).ThenByDescending(unit => unit.Speed).ToList();
 }

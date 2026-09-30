@@ -1,5 +1,0 @@
-Player Team
-Alfyn (Icicle)
-Enemy Team
-Meep
-Guardian

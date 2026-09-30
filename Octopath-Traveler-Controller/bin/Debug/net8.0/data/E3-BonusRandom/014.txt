@@ -1,7 +1,0 @@
-Player Team
-Castti (Luminescence) [Summon Strength, Inner Strength, Fleefoot]
-Ochette (Heal Wounds) [Summon Strength]
-Alfyn (Cross Strike) [Elemental Edge, Fleefoot, Elemental Augmentation]
-Enemy Team
-Dreadwolf
-Behemoth

@@ -1,22 +1,22 @@
 using Octopath_Traveler.Models;
+using Octopath_Traveler_View;
 
 namespace Octopath_Traveler.Combat;
 
 public class BeastTurn
 {
-    private readonly CombatRenderer _renderer;
+    private readonly ICombatLogView _combatLog;
     private readonly ValidatedTeam _team;
 
-    public BeastTurn(CombatRenderer renderer, ValidatedTeam team)
+    public BeastTurn(ICombatLogView combatLog, ValidatedTeam team)
     {
-        _renderer = renderer;
+        _combatLog = combatLog;
         _team = team;
     }
 
-    public void Play(Beast beast)
-        => _renderer.ShowBeastAttack(beast.Attack(ChooseTarget()), beast.Skill);
-
-    private Traveler ChooseTarget()
-        => _team.LivingTravelers()
-            .OrderByDescending(traveler => traveler.Stats.HpCurrent).First();
+    public TurnResult Play(Beast beast)
+    {
+        _combatLog.AnnounceSkillUse(beast.UseSkill(_team.LivingTravelers), beast.SkillName);
+        return TurnResult.Completed;
+    }
 }

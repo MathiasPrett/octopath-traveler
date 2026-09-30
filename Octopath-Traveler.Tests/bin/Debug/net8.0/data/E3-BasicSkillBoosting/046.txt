@@ -1,6 +1,0 @@
-Player Team
-Osvald (Shooting Stars)
-Enemy Team
-Devourer of Dreams
-Thunder Wisp
-Horse Fly

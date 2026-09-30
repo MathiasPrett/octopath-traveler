@@ -1,7 +1,0 @@
-Player Team
-Cyrus (Fireball)
-Enemy Team
-Wolf
-Devourer of Dreams
-Meep
-Withered Wanderweed

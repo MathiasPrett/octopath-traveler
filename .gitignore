@@ -1,3 +1,6 @@
 /docs
 /CLAUDE.md
 .claude/
+
+bin/
+obj/

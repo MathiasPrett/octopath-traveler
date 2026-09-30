@@ -1,6 +1,0 @@
-Player Team
-Cyrus (Lightning Bolt)
-Enemy Team
-Snow Fox
-Shaggy Meep
-Behemoth

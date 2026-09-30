@@ -1,24 +1,22 @@
 using Octopath_Traveler.Models;
-using Octopath_Traveler.Utils;
+using Octopath_Traveler.Models.Skills;
 using Octopath_Traveler_View;
 
 namespace Octopath_Traveler.Combat;
 
 public class TravelerTurn
 {
-    private const int BasicAttackOption = 1;
-    private const int SkillOption = 2;
-    private const int FleeOption = 4;
+    private const string? NoWeapon = null;
 
-    private readonly CombatRenderer _renderer;
+    private readonly IBattleView _battleView;
+    private readonly ICombatLogView _combatLog;
     private readonly ValidatedTeam _team;
-    private readonly OptionReader _optionReader;
 
-    public TravelerTurn(View view, CombatRenderer renderer, ValidatedTeam team)
+    public TravelerTurn(IBattleView battleView, ICombatLogView combatLog, ValidatedTeam team)
     {
-        _renderer = renderer;
+        _battleView = battleView;
+        _combatLog = combatLog;
         _team = team;
-        _optionReader = new OptionReader(view);
     }
 
     public TurnResult Play(Traveler traveler)
@@ -30,71 +28,74 @@ public class TravelerTurn
     }
 
     private TurnResult ChooseAndExecuteAction(Traveler traveler)
-    {
-        _renderer.ShowActionMenu(traveler);
-        return ExecuteAction(traveler, _optionReader.Read());
-    }
+        => ExecuteAction(traveler, _battleView.AskForAction(traveler));
 
-    private TurnResult ExecuteAction(Traveler traveler, int option)
-    {
-        if (option == BasicAttackOption) return TryBasicAttack(traveler);
-        if (option == SkillOption) return BrowseSkills(traveler);
-        if (option == FleeOption) return Flee();
-        return TurnResult.Completed;
-    }
+    private TurnResult ExecuteAction(Traveler traveler, TravelerAction action)
+        => action switch
+        {
+            TravelerAction.BasicAttack => TryBasicAttack(traveler),
+            TravelerAction.Skill => TryUseSkill(traveler),
+            TravelerAction.Defend => Defend(traveler),
+            TravelerAction.Flee => Flee(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
     private TurnResult TryBasicAttack(Traveler traveler)
     {
-        string? weapon = ChooseWeapon(traveler);
+        string? weapon = _battleView.AskForWeapon(traveler);
         if (weapon == null) return TurnResult.Cancelled;
-        Beast? target = ChooseTarget(traveler);
+        Unit? target = _battleView.AskForTarget(traveler, _team.LivingBeasts);
         if (target == null) return TurnResult.Cancelled;
-        AskBoostPoints();
-        Attack(traveler, target, weapon);
+        _battleView.AskForBoostPoints();
+        return BasicAttack(traveler, target, weapon);
+    }
+
+    private TurnResult BasicAttack(Traveler traveler, Unit target, string weaponName)
+    {
+        _combatLog.AnnounceBasicAttack(traveler.BasicAttack(target, weaponName));
         return TurnResult.Completed;
     }
 
-    private string? ChooseWeapon(Traveler traveler)
+    private TurnResult TryUseSkill(Traveler traveler)
     {
-        _renderer.ShowWeaponMenu(traveler);
-        return ChooseFrom(traveler.Weapons);
+        ActiveSkill? skill = _battleView.AskForSkill(traveler);
+        if (skill == null) return TurnResult.Cancelled;
+        SkillUse? use = AskForSkillUse(traveler, skill);
+        if (use == null) return TurnResult.Cancelled;
+        return UseSkill(traveler, skill, use);
     }
 
-    private Beast? ChooseTarget(Traveler traveler)
+    private SkillUse? AskForSkillUse(Traveler traveler, ActiveSkill skill)
     {
-        List<Beast> targets = _team.LivingBeasts();
-        _renderer.ShowTargetMenu(traveler, targets);
-        return ChooseFrom(targets);
+        if (!skill.NeedsWeaponChoice) return AskForSkillTargets(traveler, skill, NoWeapon);
+        string? weapon = _battleView.AskForAnyWeapon();
+        return weapon == null ? null : AskForSkillTargets(traveler, skill, weapon);
     }
 
-    private T? ChooseFrom<T>(List<T> items) where T : class
+    private SkillUse? AskForSkillTargets(Traveler traveler, ActiveSkill skill, string? weaponName)
     {
-        int option = _optionReader.Read();
-        return IsCancel(option, items.Count) ? null : items[option - 1];
+        List<Unit> candidates = skill.FindCandidates(_team, traveler);
+        if (!skill.NeedsTargetChoice) return new SkillUse(traveler, candidates, weaponName);
+        Unit? target = _battleView.AskForTarget(traveler, candidates);
+        return target == null ? null : new SkillUse(traveler, new List<Unit> { target }, weaponName);
     }
 
-    private void AskBoostPoints()
+    private TurnResult UseSkill(Traveler traveler, ActiveSkill skill, SkillUse use)
     {
-        _renderer.ShowBoostPointPrompt();
-        _optionReader.Read();
+        _battleView.AskForBoostPoints();
+        _combatLog.AnnounceSkillUse(traveler.Use(skill, use), skill.Name);
+        return TurnResult.Completed;
     }
 
-    private void Attack(Traveler attacker, Beast target, string weaponName)
-        => _renderer.ShowTravelerAttack(attacker.Attack(target), weaponName);
-
-    private TurnResult BrowseSkills(Traveler traveler)
+    private TurnResult Defend(Traveler traveler)
     {
-        _renderer.ShowSkillMenu(traveler);
-        _optionReader.Read();
-        return TurnResult.Cancelled;
+        traveler.Defend();
+        return TurnResult.Completed;
     }
 
     private TurnResult Flee()
     {
-        _renderer.ShowFlee();
+        _combatLog.AnnounceFlee();
         return TurnResult.Fled;
     }
-
-    private static bool IsCancel(int option, int itemCount)
-        => option > itemCount;
 }

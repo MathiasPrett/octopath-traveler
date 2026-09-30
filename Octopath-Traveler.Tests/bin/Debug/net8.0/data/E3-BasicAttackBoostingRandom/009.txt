@@ -1,4 +1,0 @@
-Player Team
-Castti
-Enemy Team
-Behemoth
