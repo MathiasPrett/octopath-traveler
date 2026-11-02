@@ -4,5 +4,5 @@ public abstract class Effect
 {
     public virtual bool NeedsWeapon => false;
 
-    public abstract CombatEvent Apply(SkillParameters parameters, Unit target);
+    public abstract void Apply(SkillParameters parameters, Unit target, ActionReport report);
 }

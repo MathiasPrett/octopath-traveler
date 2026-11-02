@@ -11,8 +11,8 @@ public class DamageEffect : Effect
         _modifier = modifier;
     }
 
-    public override CombatEvent Apply(SkillParameters parameters, Unit target)
-        => parameters.User.Hit(target, CreateAttack(parameters));
+    public override void Apply(SkillParameters parameters, Unit target, ActionReport report)
+        => report.Record(parameters.User.Hit(target, CreateAttack(parameters)));
 
     protected virtual Attack CreateAttack(SkillParameters parameters)
         => new Attack(_type, _modifier);

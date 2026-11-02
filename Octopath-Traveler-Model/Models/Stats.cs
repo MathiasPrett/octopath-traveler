@@ -45,6 +45,9 @@ public class Stats
     public void ReduceHp(int amount)
         => CurrentHp = Math.Max(MinimumHp, CurrentHp - amount);
 
+    public void RestoreHp(int amount)
+        => CurrentHp = Math.Min(MaxHp, CurrentHp + amount);
+
     public void ApplyBonus(StatType stat, int amount)
     {
         switch (stat)

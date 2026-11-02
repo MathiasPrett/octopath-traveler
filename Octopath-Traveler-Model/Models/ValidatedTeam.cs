@@ -17,6 +17,9 @@ public class ValidatedTeam
     public List<Traveler> LivingTravelers
         => _travelers.Where(traveler => traveler.IsAlive).ToList();
 
+    public List<Traveler> FallenTravelers
+        => _travelers.Where(traveler => !traveler.IsAlive).ToList();
+
     public List<Beast> LivingBeasts
         => _beasts.Where(beast => beast.IsAlive).ToList();
 

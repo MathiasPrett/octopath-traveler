@@ -14,6 +14,11 @@ public class ConsoleCombatLogView : ConsoleCombatView, ICombatLogView, ICombatEv
     private const string PhysicalDamage = "físico";
     private const string ElementalDamage = "elemental";
     private const string WeaponDamage = "de tipo";
+    private const string RecoversMessage = "recupera";
+    private const string HealthSuffix = "de vida";
+    private const string RevivesMessage = "revive";
+    private const string TrapMessage = "tendrá menor prioridad de turno durante";
+    private const string RoundsSuffix = "rondas";
 
     public ConsoleCombatLogView(View view) : base(view) { }
 
@@ -38,6 +43,15 @@ public class ConsoleCombatLogView : ConsoleCombatView, ICombatLogView, ICombatEv
         WriteLine($"{damage.Target.Name} recibe {damage.Damage} de daño{Describe(damage)}");
         if (damage.CausedBreak) WriteLine($"{damage.Target.Name} {BreakingPointMessage}");
     }
+
+    void ICombatEventVisitor.Visit(HealEvent heal)
+        => WriteLine($"{heal.Target.Name} {RecoversMessage} {heal.Amount} {HealthSuffix}");
+
+    void ICombatEventVisitor.Visit(ReviveEvent revive)
+        => WriteLine($"{revive.Target.Name} {RevivesMessage}");
+
+    void ICombatEventVisitor.Visit(TrapEvent trap)
+        => WriteLine($"{trap.Target.Name} {TrapMessage} {trap.Rounds} {RoundsSuffix}");
 
     private void ShowReport(ActionReport report)
     {
