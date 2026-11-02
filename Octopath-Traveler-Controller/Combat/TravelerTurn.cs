@@ -7,6 +7,7 @@ namespace Octopath_Traveler.Combat;
 public class TravelerTurn
 {
     private const string? NoWeapon = null;
+    private const int NoBoostPoints = 0;
 
     private readonly IBattleView _battleView;
     private readonly ICombatLogView _combatLog;
@@ -44,8 +45,7 @@ public class TravelerTurn
     {
         BasicAttackChoice? choice = AskForBasicAttackChoice(traveler);
         if (choice == null) return TurnResult.Cancelled;
-        _battleView.AskForBoostPoints();
-        return BasicAttack(traveler, choice);
+        return BasicAttack(traveler, choice, AskForBoostPoints(traveler));
     }
 
     private BasicAttackChoice? AskForBasicAttackChoice(Traveler traveler)
@@ -56,9 +56,9 @@ public class TravelerTurn
         return target == null ? null : new BasicAttackChoice(weapon, target);
     }
 
-    private TurnResult BasicAttack(Traveler traveler, BasicAttackChoice choice)
+    private TurnResult BasicAttack(Traveler traveler, BasicAttackChoice choice, int boostPoints)
     {
-        _combatLog.AnnounceBasicAttack(traveler.BasicAttack(choice.Target, choice.WeaponName));
+        _combatLog.AnnounceBasicAttack(traveler.BasicAttack(choice.Target, choice.WeaponName, boostPoints));
         return TurnResult.Completed;
     }
 
@@ -94,9 +94,22 @@ public class TravelerTurn
 
     private TurnResult UseSkill(Traveler traveler, SkillChoice choice)
     {
-        _battleView.AskForBoostPoints();
-        _combatLog.AnnounceSkillUse(traveler.Use(choice.Skill, choice.Parameters), choice.Skill.Name);
+        int boostPoints = AskForBoostPoints(traveler);
+        _combatLog.AnnounceSkillUse(traveler.Use(choice.Skill, choice.Parameters, boostPoints), choice.Skill.Name);
         return TurnResult.Completed;
+    }
+
+    private int AskForBoostPoints(Traveler traveler)
+    {
+        if (!traveler.HasBoostPoints) return NoBoostPoints;
+        int amount = _battleView.AskForBoostPoints();
+        return traveler.CanSpendBoostPoints(amount) ? amount : RejectBoostPoints(traveler, amount);
+    }
+
+    private int RejectBoostPoints(Traveler traveler, int amount)
+    {
+        _battleView.AnnounceNotEnoughBoostPoints(traveler, amount);
+        return AskForBoostPoints(traveler);
     }
 
     private TurnResult Defend(Traveler traveler)

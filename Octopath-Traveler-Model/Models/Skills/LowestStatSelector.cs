@@ -4,6 +4,6 @@ public class LowestStatSelector : StatTargetSelector
 {
     public LowestStatSelector(StatType stat) : base(stat) { }
 
-    public override List<Unit> Select(List<Traveler> candidates)
+    public override List<Unit> Select(List<Unit> candidates)
         => AsList(candidates.OrderBy(candidate => candidate.GetStatValue(Stat)).First());
 }

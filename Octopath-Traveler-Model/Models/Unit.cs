@@ -63,6 +63,9 @@ public abstract class Unit
         return new ReviveEvent { Target = this };
     }
 
+    public virtual SpRecoveryEvent RestoreSp(int amount)
+        => new SpRecoveryEvent { Target = this, Amount = amount };
+
     public TrapEvent Trap(int rounds)
     {
         _trap.Add(rounds);

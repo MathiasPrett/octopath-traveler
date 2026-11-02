@@ -19,6 +19,7 @@ public class ConsoleCombatLogView : ConsoleCombatView, ICombatLogView, ICombatEv
     private const string RevivesMessage = "revive";
     private const string TrapMessage = "tendrá menor prioridad de turno durante";
     private const string RoundsSuffix = "rondas";
+    private const string SpSuffix = "SP";
 
     public ConsoleCombatLogView(View view) : base(view) { }
 
@@ -49,6 +50,9 @@ public class ConsoleCombatLogView : ConsoleCombatView, ICombatLogView, ICombatEv
 
     void ICombatEventVisitor.Visit(ReviveEvent revive)
         => WriteLine($"{revive.Target.Name} {RevivesMessage}");
+
+    void ICombatEventVisitor.Visit(SpRecoveryEvent spRecovery)
+        => WriteLine($"{spRecovery.Target.Name} {RecoversMessage} {spRecovery.Amount} {SpSuffix}");
 
     void ICombatEventVisitor.Visit(TrapEvent trap)
         => WriteLine($"{trap.Target.Name} {TrapMessage} {trap.Rounds} {RoundsSuffix}");

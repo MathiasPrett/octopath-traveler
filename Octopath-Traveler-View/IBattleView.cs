@@ -11,4 +11,5 @@ public interface IBattleView
     ActiveSkill? AskForSkill(Traveler traveler);
     Unit? AskForTarget(Traveler traveler, IReadOnlyList<Unit> targets);
     int AskForBoostPoints();
+    void AnnounceNotEnoughBoostPoints(Traveler traveler, int amount);
 }

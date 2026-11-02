@@ -17,6 +17,12 @@ public class ActionReport
         => _events.Where(combatEvent => combatEvent.ChangedHp)
             .Select(combatEvent => combatEvent.Target).Distinct().ToList();
 
+    public int TotalDamageTo(Unit target)
+    {
+        IEnumerable<DamageEvent> damages = _events.OfType<DamageEvent>();
+        return damages.Where(damage => damage.Target == target).Sum(damage => damage.Damage);
+    }
+
     public void Record(CombatEvent combatEvent)
         => _events.Add(combatEvent);
 }

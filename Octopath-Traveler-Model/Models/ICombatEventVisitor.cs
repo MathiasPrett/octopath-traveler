@@ -6,4 +6,5 @@ public interface ICombatEventVisitor
     void Visit(HealEvent heal);
     void Visit(ReviveEvent revive);
     void Visit(TrapEvent trap);
+    void Visit(SpRecoveryEvent spRecovery);
 }

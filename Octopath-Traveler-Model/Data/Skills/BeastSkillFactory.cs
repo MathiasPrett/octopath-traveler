@@ -48,16 +48,13 @@ public static class BeastSkillFactory
             .Select(pair => (StatType?)pair.Value).FirstOrDefault();
 
     private static List<Effect> CreateEffects(BeastSkillJson skill)
-        => Repeat(RequireName(skill) == VortalClaw ? new HalveHpEffect() : CreateDamageEffect(skill), skill.Hits);
+        => EffectRepetition.Repeat(RequireName(skill) == VortalClaw ? new HalveHpEffect() : CreateDamageEffect(skill), skill.Hits);
 
     private static Effect CreateDamageEffect(BeastSkillJson skill)
         => new DamageEffect(DeriveType(skill), skill.Modifier);
 
     private static AttackType DeriveType(BeastSkillJson skill)
         => RequireDescription(skill).Contains(PhysicalAttack) ? AttackType.CreatePhysical() : AttackType.CreateElemental();
-
-    private static List<Effect> Repeat(Effect effect, int hits)
-        => Enumerable.Repeat(effect, hits).ToList();
 
     private static string RequireName(BeastSkillJson skill)
         => skill.Name ?? throw new InvalidDataException("skill sin nombre");

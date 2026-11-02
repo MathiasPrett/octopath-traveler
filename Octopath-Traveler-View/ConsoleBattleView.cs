@@ -10,6 +10,8 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
     private const string SkillMenuHeader = "Seleccione una habilidad para";
     private const string TargetMenuHeader = "Seleccione un objetivo para";
     private const string BoostPointPrompt = "Seleccione cuantos BP utilizar";
+    private const string NotEnoughBoostPointsMessage = "no tiene";
+    private const string BoostPointsSuffix = "BP para utilizar";
     private const string CancelOption = "Cancelar";
     private const string MenuSeparator = ": ";
 
@@ -64,6 +66,9 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
         ShowBlock(BoostPointPrompt);
         return _optionReader.Read();
     }
+
+    public void AnnounceNotEnoughBoostPoints(Traveler traveler, int amount)
+        => ShowBlock($"{traveler.Name} {NotEnoughBoostPointsMessage} {amount} {BoostPointsSuffix}");
 
     private void ShowMenu(string header, IReadOnlyList<string> options)
         => ShowNumberedList(header, options, MenuSeparator);

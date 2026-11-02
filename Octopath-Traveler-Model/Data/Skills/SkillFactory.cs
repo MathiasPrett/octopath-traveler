@@ -17,10 +17,29 @@ public static class SkillFactory
     private const string Revive = "Revive";
     private const string LegholdTrap = "Leghold Trap";
     private const string Spearhead = "Spearhead";
+    private const string HpThief = "HP Thief";
+    private const string StealSp = "Steal SP";
+    private const string ThousandSpears = "Thousand Spears";
+    private const string RainOfArrows = "Rain of Arrows";
+    private const string GuardianLiondog = "Guardian Liondog";
 
     private const int LegholdTrapRounds = 2;
+    private const int SingleHit = 1;
+    private const double HpThiefRatio = 0.5;
+    private const double StealSpRatio = 0.05;
 
     private static readonly string[] ShootingStarsTypes = { "Wind", "Light", "Dark" };
+
+    private static readonly Dictionary<string, int> HitsBySkill = new()
+    {
+        ["Fire Storm"] = 2, ["Blizzard"] = 2, ["Lightning Blast"] = 2,
+        [HpThief] = 2, [StealSp] = 2,
+        ["Ignis Ardere"] = 3, ["Glacies Claudere"] = 3, ["Tonitrus Canere"] = 3,
+        ["Ventus Saltare"] = 3, ["Lux Congerere"] = 3, ["Tenebrae Operire"] = 3,
+        [GuardianLiondog] = 5,
+        [RainOfArrows] = 6, ["Arrowstorm"] = 6,
+        [ThousandSpears] = 7
+    };
 
     private static readonly Dictionary<string, SkillTargeting> Targetings = new()
     {
@@ -45,13 +64,18 @@ public static class SkillFactory
         [Revive] = _ => AsList(new ReviveEffect()),
         [LegholdTrap] = _ => AsList(new TrapEffect(LegholdTrapRounds)),
         [Spearhead] = skill => new List<Effect>
-            { CreateTypedDamage(skill), new ClaimPriorityEffect(TurnPriority.Spearheaded) }
+            { CreateTypedDamage(skill), new ClaimPriorityEffect(TurnPriority.Spearheaded) },
+        [HpThief] = skill => CreateDrainingAttack(skill, new DrainHpEffect(HpThiefRatio)),
+        [StealSp] = skill => CreateDrainingAttack(skill, new DrainSpEffect(StealSpRatio))
     };
 
     private static readonly Dictionary<string, SkillTargeting> SpecialTargetings = new()
     {
         [Vivify] = new ChosenTarget(new FallenAllies()),
-        [Revive] = new FallenAllies()
+        [Revive] = new FallenAllies(),
+        [ThousandSpears] = new SelectedOpponent(new LowestStatSelector(StatType.PhysDef)),
+        [RainOfArrows] = new SelectedOpponent(new LowestStatSelector(StatType.CurrentHp)),
+        [GuardianLiondog] = new SelectedOpponent(new HighestStatSelector(StatType.Speed))
     };
 
     public static ActiveSkill Create(SkillJson skill)
@@ -69,8 +93,14 @@ public static class SkillFactory
 
     private static List<Effect> CreateDamageEffects(SkillJson skill)
         => DealsTypedDamage(skill)
-            ? AsList(CreateTypedDamage(skill))
+            ? EffectRepetition.Repeat(CreateTypedDamage(skill), GetHits(skill))
             : new List<Effect>();
+
+    private static List<Effect> CreateDrainingAttack(SkillJson skill, Effect drain)
+        => CreateDamageEffects(skill).Append(drain).ToList();
+
+    private static int GetHits(SkillJson skill)
+        => HitsBySkill.GetValueOrDefault(Require(skill.Name, "una habilidad sin nombre"), SingleHit);
 
     private static List<Effect> CreateHealEffects(SkillJson skill)
         => AsList(new HealEffect(skill.Modifier));
