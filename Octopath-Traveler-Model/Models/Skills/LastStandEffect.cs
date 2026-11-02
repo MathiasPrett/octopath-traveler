@@ -7,8 +7,8 @@ public class LastStandEffect : DamageEffect
 
     public LastStandEffect(AttackType type, double modifier) : base(type, modifier) { }
 
-    protected override Attack CreateAttack(SkillUse use)
-        => base.CreateAttack(use).WithBonus(CalculateBonus(use.User));
+    protected override Attack CreateAttack(SkillParameters parameters)
+        => base.CreateAttack(parameters).CopyWithBonus(CalculateBonus(parameters.User));
 
     private static double CalculateBonus(Unit user)
         => 1 + BonusPerMissingPercent * CalculateMissingHpPercent(user);

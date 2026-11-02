@@ -5,8 +5,8 @@ namespace Octopath_Traveler.Data;
 
 public static class CatalogLoader
 {
-    private const string CharactersFile = "characters.json";
-    private const string EnemiesFile = "enemies.json";
+    private const string TravelersFile = "characters.json";
+    private const string BeastsFile = "enemies.json";
     private const string SkillsFile = "skills.json";
     private const string PassiveSkillsFile = "passive_skills.json";
     private const string BeastSkillsFile = "beast_skills.json";
@@ -16,8 +16,8 @@ public static class CatalogLoader
     public static GameCatalog LoadCatalog(string dataFolder)
         => new GameCatalog
         {
-            Characters = ReadJsonList<CharacterJson>(dataFolder, CharactersFile),
-            Enemies = ReadJsonList<EnemyJson>(dataFolder, EnemiesFile),
+            Travelers = ReadJsonList<TravelerJson>(dataFolder, TravelersFile),
+            Beasts = ReadJsonList<BeastJson>(dataFolder, BeastsFile),
             Skills = ReadJsonList<SkillJson>(dataFolder, SkillsFile),
             PassiveSkills = ReadJsonList<PassiveSkillJson>(dataFolder, PassiveSkillsFile),
             BeastSkills = ReadJsonList<BeastSkillJson>(dataFolder, BeastSkillsFile)

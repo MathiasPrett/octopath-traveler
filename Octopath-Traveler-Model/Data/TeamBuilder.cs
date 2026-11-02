@@ -29,10 +29,10 @@ public static class TeamBuilder
 
     private static Traveler BuildBaseTraveler(ParsedTraveler parsedTraveler, GameCatalog catalog)
     {
-        CharacterJson character = RequireCharacter(parsedTraveler.Name, catalog);
-        UnitStatsJson statsJson = RequireStats(character.Stats, parsedTraveler.Name);
+        TravelerJson travelerData = RequireTraveler(parsedTraveler.Name, catalog);
+        UnitStatsJson statsJson = RequireStats(travelerData.Stats, parsedTraveler.Name);
         return new Traveler(parsedTraveler.Name, BuildStats(statsJson),
-            RequireSp(statsJson, parsedTraveler.Name), character.Weapons,
+            RequireSp(statsJson, parsedTraveler.Name), travelerData.Weapons,
             BuildActiveSkills(parsedTraveler.ActiveSkillNames, catalog));
     }
 
@@ -51,26 +51,26 @@ public static class TeamBuilder
 
     private static Beast BuildBeast(string beastName, GameCatalog catalog)
     {
-        EnemyJson enemy = RequireEnemy(beastName, catalog);
-        UnitStatsJson statsJson = RequireStats(enemy.Stats, beastName);
-        BeastSkill skill = BuildBeastSkill(RequireSkillName(enemy.Skill, beastName), catalog);
-        return new Beast(beastName, BuildStats(statsJson), skill, enemy.Shields, enemy.Weaknesses);
+        BeastJson beastData = RequireBeast(beastName, catalog);
+        UnitStatsJson statsJson = RequireStats(beastData.Stats, beastName);
+        BeastSkill skill = BuildBeastSkill(RequireSkillName(beastData.Skill, beastName), catalog);
+        return new Beast(beastName, BuildStats(statsJson), skill, beastData.Shields, beastData.Weaknesses);
     }
 
     private static Stats BuildStats(UnitStatsJson statsJson)
         => new Stats(statsJson.HP, statsJson.PhysAtk, statsJson.PhysDef,
             statsJson.ElemAtk, statsJson.ElemDef, statsJson.Speed);
 
-    private static CharacterJson RequireCharacter(string name, GameCatalog catalog)
-        => catalog.FindCharacter(name)
+    private static TravelerJson RequireTraveler(string name, GameCatalog catalog)
+        => catalog.FindTraveler(name)
            ?? throw new InvalidDataException($"{name} no existe");
 
     private static SkillJson RequireSkill(string name, GameCatalog catalog)
         => catalog.FindSkill(name)
            ?? throw new InvalidDataException($"{name} no existe");
 
-    private static EnemyJson RequireEnemy(string name, GameCatalog catalog)
-        => catalog.FindEnemy(name)
+    private static BeastJson RequireBeast(string name, GameCatalog catalog)
+        => catalog.FindBeast(name)
            ?? throw new InvalidDataException($"{name} no existe");
 
     private static UnitStatsJson RequireStats(UnitStatsJson? statsJson, string unitName)

@@ -71,9 +71,13 @@ public class CombatEngine : IUnitVisitor<TurnResult>
 
     private void PlayUnitTurn(Unit actor)
     {
-        if (actor.Accept(this) == TurnResult.Fled)
+        TurnResult result = PlayTurnOf(actor);
+        if (result == TurnResult.Fled)
             _travelersFled = true;
     }
+
+    private TurnResult PlayTurnOf(Unit actor)
+        => actor.Accept(this);
 
     TurnResult IUnitVisitor<TurnResult>.VisitTraveler(Traveler traveler)
         => _travelerTurn.Play(traveler);
@@ -83,8 +87,8 @@ public class CombatEngine : IUnitVisitor<TurnResult>
 
     private void ShowWinner()
     {
-        if (IsAnyBeastAlive()) _roundView.AnnounceEnemyVictory();
-        else _roundView.AnnouncePlayerVictory();
+        if (IsAnyBeastAlive()) _roundView.AnnounceBeastVictory();
+        else _roundView.AnnounceTravelerVictory();
     }
 
     private bool ShouldContinueRound(TurnQueue queue)

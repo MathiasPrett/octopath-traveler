@@ -40,14 +40,14 @@ public class Traveler : Unit
     public ActionReport BasicAttack(Unit target, string weaponName)
     {
         ActionReport report = new ActionReport(this);
-        report.Record(Hit(target, new Attack(AttackType.Named(weaponName), BasicAttackModifier)));
+        report.Record(Hit(target, new Attack(AttackType.CreateNamed(weaponName), BasicAttackModifier)));
         return report;
     }
 
-    public ActionReport Use(ActiveSkill skill, SkillUse use)
+    public ActionReport Use(ActiveSkill skill, SkillParameters parameters)
     {
         CurrentSp -= skill.SpCost;
-        return skill.Use(use);
+        return skill.Use(parameters);
     }
 
     public void Defend()

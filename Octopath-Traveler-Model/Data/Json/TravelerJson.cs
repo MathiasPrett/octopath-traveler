@@ -1,6 +1,6 @@
 namespace Octopath_Traveler.Data.Json;
 
-public class CharacterJson
+public class TravelerJson
 {
     public string? Name;
     public UnitStatsJson? Stats;

@@ -22,9 +22,9 @@ public class Attack
         CanKill = canKill;
     }
 
-    public Attack WithBonus(double bonus)
+    public Attack CopyWithBonus(double bonus)
         => new Attack(Type, Modifier, bonus, CanKill);
 
-    public Attack ThatCannotKill()
+    public Attack CopyThatCannotKill()
         => new Attack(Type, Modifier, Bonus, false);
 }

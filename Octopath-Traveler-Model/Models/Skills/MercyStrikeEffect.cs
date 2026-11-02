@@ -4,6 +4,6 @@ public class MercyStrikeEffect : DamageEffect
 {
     public MercyStrikeEffect(AttackType type, double modifier) : base(type, modifier) { }
 
-    protected override Attack CreateAttack(SkillUse use)
-        => base.CreateAttack(use).ThatCannotKill();
+    protected override Attack CreateAttack(SkillParameters parameters)
+        => base.CreateAttack(parameters).CopyThatCannotKill();
 }

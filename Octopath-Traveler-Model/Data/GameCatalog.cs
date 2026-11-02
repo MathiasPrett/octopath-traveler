@@ -4,17 +4,17 @@ namespace Octopath_Traveler.Data;
 
 public class GameCatalog
 {
-    public required IReadOnlyList<CharacterJson> Characters { get; init; }
-    public required IReadOnlyList<EnemyJson> Enemies { get; init; }
+    public required IReadOnlyList<TravelerJson> Travelers { get; init; }
+    public required IReadOnlyList<BeastJson> Beasts { get; init; }
     public required IReadOnlyList<SkillJson> Skills { get; init; }
     public required IReadOnlyList<PassiveSkillJson> PassiveSkills { get; init; }
     public required IReadOnlyList<BeastSkillJson> BeastSkills { get; init; }
 
-    public CharacterJson? FindCharacter(string name)
-        => Characters.FirstOrDefault(character => character.Name == name);
+    public TravelerJson? FindTraveler(string name)
+        => Travelers.FirstOrDefault(traveler => traveler.Name == name);
 
-    public EnemyJson? FindEnemy(string name)
-        => Enemies.FirstOrDefault(enemy => enemy.Name == name);
+    public BeastJson? FindBeast(string name)
+        => Beasts.FirstOrDefault(beast => beast.Name == name);
 
     public SkillJson? FindSkill(string name)
         => Skills.FirstOrDefault(skill => skill.Name == name);

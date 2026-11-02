@@ -11,6 +11,6 @@ public class WeaponDamageEffect : Effect
 
     public override bool NeedsWeapon => true;
 
-    public override CombatEvent Apply(SkillUse use, Unit target)
-        => use.User.Hit(target, new Attack(use.Weapon, _modifier));
+    public override CombatEvent Apply(SkillParameters parameters, Unit target)
+        => parameters.User.Hit(target, new Attack(parameters.Weapon, _modifier));
 }

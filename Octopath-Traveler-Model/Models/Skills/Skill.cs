@@ -14,6 +14,6 @@ public abstract class Skill
 
     protected bool NeedsWeapon => _effects.NeedsWeapon;
 
-    protected ActionReport Apply(SkillUse use)
-        => _effects.ApplyTo(use);
+    protected ActionReport Apply(SkillParameters parameters)
+        => _effects.ApplyTo(parameters);
 }

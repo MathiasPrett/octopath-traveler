@@ -2,6 +2,7 @@ namespace Octopath_Traveler.Models;
 
 public abstract class Unit
 {
+    private const int DeadHp = 0;
     protected const double NoDamageChange = 1;
 
     private readonly Stats _stats;
@@ -18,7 +19,7 @@ public abstract class Unit
     public int CurrentHp => _stats.CurrentHp;
     public int MaxHp => _stats.MaxHp;
     public int Speed => _stats.Speed;
-    public bool IsAlive => CurrentHp > 0;
+    public bool IsAlive => CurrentHp > DeadHp;
 
     public virtual bool IsDefending => false;
     public virtual bool CanActThisRound => IsAlive;

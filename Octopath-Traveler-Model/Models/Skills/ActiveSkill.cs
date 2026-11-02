@@ -20,6 +20,6 @@ public class ActiveSkill : Skill
     public List<Unit> FindCandidates(ValidatedTeam team, Unit user)
         => _targeting.FindCandidates(team, user);
 
-    public ActionReport Use(SkillUse use)
-        => Apply(use);
+    public ActionReport Use(SkillParameters parameters)
+        => Apply(parameters);
 }

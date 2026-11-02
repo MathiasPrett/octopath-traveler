@@ -54,7 +54,7 @@ public static class BeastSkillFactory
         => new DamageEffect(DeriveType(skill), skill.Modifier);
 
     private static AttackType DeriveType(BeastSkillJson skill)
-        => RequireDescription(skill).Contains(PhysicalAttack) ? AttackType.Physical() : AttackType.Elemental();
+        => RequireDescription(skill).Contains(PhysicalAttack) ? AttackType.CreatePhysical() : AttackType.CreateElemental();
 
     private static List<Effect> Repeat(Effect effect, int hits)
         => Enumerable.Repeat(effect, hits).ToList();

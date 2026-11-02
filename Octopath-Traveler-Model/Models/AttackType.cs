@@ -13,13 +13,13 @@ public class AttackType
         Category = category;
     }
 
-    public static AttackType Named(string name)
+    public static AttackType CreateNamed(string name)
         => new AttackType(name, AttackTypeNames.GetCategory(name));
 
-    public static AttackType Physical()
+    public static AttackType CreatePhysical()
         => new AttackType(Unnamed, AttackCategory.Physical);
 
-    public static AttackType Elemental()
+    public static AttackType CreateElemental()
         => new AttackType(Unnamed, AttackCategory.Elemental);
 
     public bool HasName => Name != Unnamed;

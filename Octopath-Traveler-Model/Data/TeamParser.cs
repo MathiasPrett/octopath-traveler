@@ -2,24 +2,24 @@ namespace Octopath_Traveler.Data;
 
 public static class TeamParser
 {
-    private const string PlayerTeamHeader = "Player Team";
-    private const string EnemyTeamHeader = "Enemy Team";
+    private const string TravelerTeamHeader = "Player Team";
+    private const string BeastTeamHeader = "Enemy Team";
     private const int NotFound = -1;
 
     public static ParsedTeamFile Parse(string[] rawLines)
     {
         string[] lines = TrimAllLines(rawLines);
-        int playerHeaderIndex = Array.IndexOf(lines, PlayerTeamHeader);
-        int enemyHeaderIndex = Array.IndexOf(lines, EnemyTeamHeader);
-        return AreBothFound(playerHeaderIndex, enemyHeaderIndex)
-            ? ParseSections(lines, playerHeaderIndex, enemyHeaderIndex)
+        int travelerHeaderIndex = Array.IndexOf(lines, TravelerTeamHeader);
+        int beastHeaderIndex = Array.IndexOf(lines, BeastTeamHeader);
+        return AreBothFound(travelerHeaderIndex, beastHeaderIndex)
+            ? ParseSections(lines, travelerHeaderIndex, beastHeaderIndex)
             : CreateEmptyTeam();
     }
 
-    private static ParsedTeamFile ParseSections(string[] lines, int playerHeaderIndex, int enemyHeaderIndex)
+    private static ParsedTeamFile ParseSections(string[] lines, int travelerHeaderIndex, int beastHeaderIndex)
         => new ParsedTeamFile(
-            ParseTravelerLines(lines, playerHeaderIndex + 1, enemyHeaderIndex),
-            ParseBeastLines(lines, enemyHeaderIndex + 1, lines.Length));
+            ParseTravelerLines(lines, travelerHeaderIndex + 1, beastHeaderIndex),
+            ParseBeastLines(lines, beastHeaderIndex + 1, lines.Length));
 
     private static ParsedTeamFile CreateEmptyTeam()
         => new ParsedTeamFile(new List<ParsedTraveler>(), new List<string>());
@@ -37,7 +37,16 @@ public static class TeamParser
         => SelectNonBlankLines(lines, start, end).ToList();
 
     private static IEnumerable<string> SelectNonBlankLines(string[] lines, int start, int end)
-        => lines.Skip(start).Take(end - start).Where(line => !IsBlank(line));
+    {
+        IEnumerable<string> section = SelectSection(lines, start, end);
+        return section.Where(line => !IsBlank(line));
+    }
+
+    private static IEnumerable<string> SelectSection(string[] lines, int start, int end)
+    {
+        IEnumerable<string> fromStart = lines.Skip(start);
+        return fromStart.Take(end - start);
+    }
 
     private static bool IsBlank(string line)
         => line.Length == 0;
@@ -76,5 +85,8 @@ public static class TeamParser
     }
 
     private static List<string> SplitAndTrim(string commaSeparated)
-        => commaSeparated.Split(',').Select(part => part.Trim()).ToList();
+    {
+        string[] parts = commaSeparated.Split(',');
+        return parts.Select(part => part.Trim()).ToList();
+    }
 }

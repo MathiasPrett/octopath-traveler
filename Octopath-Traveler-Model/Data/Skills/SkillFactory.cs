@@ -15,8 +15,8 @@ public static class SkillFactory
 
     private static readonly Dictionary<string, SkillTargeting> Targetings = new()
     {
-        ["Single"] = new ChosenTarget(new AllEnemies()),
-        ["Enemies"] = new AllEnemies(),
+        ["Single"] = new ChosenTarget(new AllOpponents()),
+        ["Enemies"] = new AllOpponents(),
         ["Ally"] = new ChosenTarget(new AllAllies()),
         ["Party"] = new AllAllies(),
         ["User"] = new UserOnly(),
@@ -42,7 +42,7 @@ public static class SkillFactory
 
     private static List<Effect> CreateShootingStarsEffects(SkillJson skill)
         => ShootingStarsTypes
-            .Select(type => (Effect)new DamageEffect(AttackType.Named(type), skill.Modifier)).ToList();
+            .Select(type => (Effect)new DamageEffect(AttackType.CreateNamed(type), skill.Modifier)).ToList();
 
     private static List<Effect> CreateDamageEffects(SkillJson skill)
         => DealsTypedDamage(skill)
@@ -56,7 +56,7 @@ public static class SkillFactory
         => new List<Effect> { effect };
 
     private static AttackType ParseType(SkillJson skill)
-        => AttackType.Named(Require(skill.Type, $"el tipo de {skill.Name}"));
+        => AttackType.CreateNamed(Require(skill.Type, $"el tipo de {skill.Name}"));
 
     private static SkillTargeting ParseTarget(SkillJson skill)
         => Targetings.GetValueOrDefault(Require(skill.Target, $"el objetivo de {skill.Name}"))

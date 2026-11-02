@@ -11,5 +11,5 @@ public class BeastSkill : Skill
     }
 
     public ActionReport Use(Unit user, List<Traveler> candidates)
-        => Apply(new SkillUse(user, _selector.Select(candidates)));
+        => Apply(new SkillParameters(user, _selector.Select(candidates)));
 }

@@ -10,16 +10,16 @@ public static class TeamValidator
     private const int MaxPassiveSkills = 4;
 
     public static bool IsValid(ParsedTeamFile team, GameCatalog catalog)
-        => IsPlayerTeamValid(team.Travelers, catalog) && IsEnemyTeamValid(team.BeastNames, catalog);
+        => IsTravelerTeamValid(team.Travelers, catalog) && IsBeastTeamValid(team.BeastNames, catalog);
 
-    private static bool IsPlayerTeamValid(List<ParsedTraveler> travelers, GameCatalog catalog)
+    private static bool IsTravelerTeamValid(List<ParsedTraveler> travelers, GameCatalog catalog)
     {
         if (!IsCountInRange(travelers.Count, MinTravelers, MaxTravelers)) return false;
         if (HasRepeatedNames(GetTravelerNames(travelers))) return false;
         return AreAllTravelersValid(travelers, catalog);
     }
 
-    private static bool IsEnemyTeamValid(List<string> beastNames, GameCatalog catalog)
+    private static bool IsBeastTeamValid(List<string> beastNames, GameCatalog catalog)
     {
         if (!IsCountInRange(beastNames.Count, MinBeasts, MaxBeasts)) return false;
         if (HasRepeatedNames(beastNames)) return false;
@@ -31,7 +31,7 @@ public static class TeamValidator
 
     private static bool IsTravelerValid(ParsedTraveler traveler, GameCatalog catalog)
     {
-        if (catalog.FindCharacter(traveler.Name) == null) return false;
+        if (catalog.FindTraveler(traveler.Name) == null) return false;
         if (!AreActiveSkillsValid(traveler.ActiveSkillNames, catalog)) return false;
         return ArePassiveSkillsValid(traveler.PassiveSkillNames, catalog);
     }
@@ -50,7 +50,7 @@ public static class TeamValidator
     }
 
     private static bool DoAllBeastsExist(List<string> beastNames, GameCatalog catalog)
-        => beastNames.All(beastName => catalog.FindEnemy(beastName) != null);
+        => beastNames.All(beastName => catalog.FindBeast(beastName) != null);
 
     private static List<string> GetTravelerNames(List<ParsedTraveler> travelers)
         => travelers.Select(traveler => traveler.Name).ToList();

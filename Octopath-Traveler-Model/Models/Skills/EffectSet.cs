@@ -12,14 +12,14 @@ public class EffectSet
     public bool NeedsWeapon
         => _effects.Any(effect => effect.NeedsWeapon);
 
-    public ActionReport ApplyTo(SkillUse use)
+    public ActionReport ApplyTo(SkillParameters parameters)
     {
-        ActionReport report = new ActionReport(use.User);
-        foreach (CombatEvent combatEvent in use.Targets.SelectMany(target => ApplyAll(use, target)))
+        ActionReport report = new ActionReport(parameters.User);
+        foreach (CombatEvent combatEvent in parameters.Targets.SelectMany(target => ApplyAll(parameters, target)))
             report.Record(combatEvent);
         return report;
     }
 
-    private IEnumerable<CombatEvent> ApplyAll(SkillUse use, Unit target)
-        => _effects.Select(effect => effect.Apply(use, target));
+    private IEnumerable<CombatEvent> ApplyAll(SkillParameters parameters, Unit target)
+        => _effects.Select(effect => effect.Apply(parameters, target));
 }
