@@ -60,3 +60,5 @@ C:/Users/matia/Desktop/Base Octopath/Octopath-Traveler/Octopath-Traveler-View/ob
 /home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/bin/Debug/net8.0/Octopath-Traveler-Model.pdb
 /home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/obj/Debug/net8.0/Octopath-Traveler-View.csproj.AssemblyReference.cache
 /home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/obj/Debug/net8.0/Octopath.7E2270E9.Up2Date
+/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/bin/Debug/net8.0/OctopathTravelerGUI.dll
+/home/mathias/Escritorio/dds/octopath-traveler/Octopath-Traveler-View/obj/Debug/net8.0/Avalonia/Resources.Inputs.cache

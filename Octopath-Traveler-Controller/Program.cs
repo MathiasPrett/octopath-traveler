@@ -1,5 +1,6 @@
 ﻿using Octopath_Traveler;
 using Octopath_Traveler_View;
+using Octopath_Traveler_View.Gui;
 
 /* 
  * Este código permite replicar un test case. Primero pregunta por el grupo de test
@@ -19,18 +20,30 @@ using Octopath_Traveler_View;
  *      var view = View.BuildManualTestingView(test);
  * por:
  *      var view = View.BuildConsoleView();
+ *
+ * Con useGui = true el juego se abre en la interfaz gráfica en vez de la consola.
  */
 
+bool useGui = true; // Cambiar a false para replicar test cases en consola
+const string DataFolder = "data";
 
+if (useGui)
+{
+    var gui = new GuiViewFactory();
+    var guiGame = new Game(gui, DataFolder);
+    gui.Start(guiGame.Play);
+}
+else
+{
+    string testFolder = SelectTestFolder();
+    string test = SelectTest(testFolder);
+    string teamsFolder = testFolder.Replace("-Tests", "");
+    AnnounceTestCase(test);
 
-string testFolder = SelectTestFolder();
-string test = SelectTest(testFolder);
-string teamsFolder = testFolder.Replace("-Tests","");
-AnnounceTestCase(test);
-
-var view = View.BuildManualTestingView(test);
-var game = new Game(view, teamsFolder);
-game.Play();
+    var view = View.BuildManualTestingView(test);
+    var game = new Game(view, teamsFolder);
+    game.Play();
+}
 
 string SelectTestFolder()
 {

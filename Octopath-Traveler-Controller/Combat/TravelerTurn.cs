@@ -102,7 +102,7 @@ public class TravelerTurn
     private int AskForBoostPoints(Traveler traveler)
     {
         if (!traveler.HasBoostPoints) return NoBoostPoints;
-        int amount = _battleView.AskForBoostPoints();
+        int amount = _battleView.AskForBoostPoints(traveler);
         return traveler.CanSpendBoostPoints(amount) ? amount : RejectBoostPoints(traveler, amount);
     }
 

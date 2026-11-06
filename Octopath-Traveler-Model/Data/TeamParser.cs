@@ -2,8 +2,8 @@ namespace Octopath_Traveler.Data;
 
 public static class TeamParser
 {
-    private const string TravelerTeamHeader = "Player Team";
-    private const string BeastTeamHeader = "Enemy Team";
+    public const string TravelerTeamHeader = "Player Team";
+    public const string BeastTeamHeader = "Enemy Team";
     private const int NotFound = -1;
 
     public static ParsedTeamFile Parse(string[] rawLines)

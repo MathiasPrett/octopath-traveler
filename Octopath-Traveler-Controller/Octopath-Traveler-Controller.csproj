@@ -13,4 +13,10 @@
       <ProjectReference Include="..\Octopath-Traveler-Model\Octopath-Traveler-Model.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="OctopathTravelerGUI">
+        <HintPath>..\Octopath-Traveler-View\GuiLib\OctopathTravelerGUI.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

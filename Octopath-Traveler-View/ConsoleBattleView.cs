@@ -12,16 +12,7 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
     private const string BoostPointPrompt = "Seleccione cuantos BP utilizar";
     private const string NotEnoughBoostPointsMessage = "no tiene";
     private const string BoostPointsSuffix = "BP para utilizar";
-    private const string CancelOption = "Cancelar";
     private const string MenuSeparator = ": ";
-
-    private static readonly (TravelerAction Action, string Label)[] ActionMenu =
-    {
-        (TravelerAction.BasicAttack, "Ataque básico"),
-        (TravelerAction.Skill, "Usar habilidad"),
-        (TravelerAction.Defend, "Defender"),
-        (TravelerAction.Flee, "Huir")
-    };
 
     private readonly OptionReader _optionReader;
 
@@ -32,36 +23,36 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
 
     public TravelerAction AskForAction(Traveler traveler)
     {
-        ShowMenu($"{TurnHeader} {traveler.Name}", ActionMenu.Select(item => item.Label).ToList());
-        return ActionMenu[_optionReader.Read() - 1].Action;
+        ShowMenu($"{TurnHeader} {traveler.Name}", BattleMenu.ActionLabels);
+        return BattleMenu.GetActionAt(_optionReader.Read() - 1);
     }
 
     public string? AskForWeapon(Traveler traveler)
     {
-        ShowMenu(WeaponMenuHeader, AppendCancel(traveler.Weapons));
+        ShowMenu(WeaponMenuHeader, BattleMenu.WithCancel(traveler.Weapons));
         return ChooseFrom(traveler.Weapons);
     }
 
     public string? AskForAnyWeapon()
     {
-        ShowMenu(WeaponMenuHeader, AppendCancel(AttackTypeNames.WeaponNames));
+        ShowMenu(WeaponMenuHeader, BattleMenu.WithCancel(AttackTypeNames.WeaponNames));
         return ChooseFrom(AttackTypeNames.WeaponNames);
     }
 
     public ActiveSkill? AskForSkill(Traveler traveler)
     {
         IReadOnlyList<ActiveSkill> skills = traveler.AffordableSkills;
-        ShowMenu($"{SkillMenuHeader} {traveler.Name}", AppendCancel(GetNames(skills)));
+        ShowMenu($"{SkillMenuHeader} {traveler.Name}", BattleMenu.WithCancel(GetNames(skills)));
         return ChooseFrom(skills);
     }
 
     public Unit? AskForTarget(Traveler traveler, IReadOnlyList<Unit> targets)
     {
-        ShowMenu($"{TargetMenuHeader} {traveler.Name}", AppendCancel(DescribeAll(targets)));
+        ShowMenu($"{TargetMenuHeader} {traveler.Name}", BattleMenu.WithCancel(DescribeAll(targets)));
         return ChooseFrom(targets);
     }
 
-    public int AskForBoostPoints()
+    public int AskForBoostPoints(Traveler traveler)
     {
         ShowBlock(BoostPointPrompt);
         return _optionReader.Read();
@@ -81,9 +72,6 @@ public class ConsoleBattleView : ConsoleCombatView, IBattleView
 
     private static bool IsCancel(int option, int itemCount)
         => option > itemCount;
-
-    private static List<string> AppendCancel(IReadOnlyList<string> options)
-        => options.Append(CancelOption).ToList();
 
     private static List<string> GetNames(IReadOnlyList<ActiveSkill> skills)
         => skills.Select(skill => skill.Name).ToList();
